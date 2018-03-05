@@ -1,0 +1,77 @@
+<style>
+
+.footer-left {  
+    position: fixed;  
+    top: 95%;  
+    left: 0%;  
+    text-align: left;  
+    width:85%;  
+}  
+  
+.footer-right {  
+    position: fixed;  
+    top: 95%;  
+    right: 0%;  
+    text-align: right;  
+    width:15%;  
+}  
+  
+.col2 {  
+    columns: 2 200px;           /* number of columns and width in pixels*/
+    -webkit-columns: 2 200px;   /* chrome, safari */
+    -moz-columns: 2 200px;      /* firefox */
+}  
+  
+</style>
+
+ДПВ "Аналитический пакет R"
+========================================================
+autosize: true
+font-family: 'Verdana'
+
+## Практика 5:  
+## <center>Интерактивные карты в R: googleVis и Leaflet</center>
+
+
+
+<!-- Нижний колонтитул -->
+<div class = "footer-left" style = "font-size: 70%; color: white; width:50%;">ГУУ, ИИС, кафедра ММЭУ</div>
+<div class = "footer-right" style = "font-size: 70%; color: white; width:50%;">весенний семестр 2017/2018</div>
+
+План практики 
+========================================================
+
+- Карта-хороплет и таблица с возможностью сортировки по импорту сливочного масла в РФ средствами пакета <font face = "Courier New">googleVis</font>     
+- Карта уровня улиц с маркерами, обозначающими расположение зданий РАНХиГС в Москве средствами пакета <font face = "Courier New">leaflet</font>   
+- Ещё один пример карты с использованием <font face = "Courier New">leaflet</font>: интерактивная карта Нигерии с радиусами, пропорциональными численности населения (автор: Omo Ofoegbu)   
+
+<!-- Нижний колонтитул -->
+
+<div class = "footer-left" style = "font-size: 70%;"><em>ДПВ "Аналитический пакет R": Приложения в пакете shiny</em></div>
+<div class = "footer-right" style = "font-size: 70%;">2</div>
+
+Виджеты в googleVis  
+========================================================
+
+- Пакет <font face = "Courier New">googleVis</font> даёт доступ к API визуализации от Google (Google Visualisation API)  
+- Результат -- интерактивный график (карта) на Java Script.  
+- Знание Java Script необязательно, но представления о базовых html-тегах поможет настроить график  
+- Примеры: [https://cran.r-project.org/web/packages/googleVis/vignettes/googleVis_examples.html](https://cran.r-project.org/web/packages/googleVis/vignettes/googleVis_examples.html)  
+
+<!-- Нижний колонтитул -->
+
+<div class = "footer-left" style = "font-size: 70%;"><em>ДПВ "Аналитический пакет R": Приложения в пакете shiny</em></div>
+<div class = "footer-right" style = "font-size: 70%;">3</div>
+
+Карты в leaflet  
+========================================================
+
+- Пакет <font face = "Courier New">leaflet</font> даёт доступ к инструментам одноимённой библиотеки для создания интерактивных карт на Java Script   
+- Результат -- интерактивная карта на Java Script. Можно добавлять свои иконки для маркеров, делать визуализацию показателей окружностями с радиусами, пропорциональными показателю, и т.д.  
+- Примеры и документация: [https://rstudio.github.io/leaflet/](https://rstudio.github.io/leaflet/)  
+
+<!-- Нижний колонтитул -->
+
+<div class = "footer-left" style = "font-size: 70%;"><em>ДПВ "Аналитический пакет R": Приложения в пакете shiny</em></div>
+<div class = "footer-right" style = "font-size: 70%;">4</div>
+

@@ -1,0 +1,105 @@
+---
+title: "Интерактивные карты с GVis и leaflet"
+author: "Svetlana Aksyuk"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+<!-- ВЫШЕ И НИЖЕ КОД ФАЙЛА "Maps_GVis.Rmd" -->
+
+Перевод примера с [RPubs](http://rpubs.com/gallery/googleVis) на русский язык с изменениями и дополнениями.  
+
+<!-- ПРОДОЛЖЕНИЕ КОДА ФАЙЛА "Maps_GVis.Rmd" -->
+## Интерактивная картограмма  
+Построена на [данных по импорту сливочного масла в РФ](https://github.com/aksyuk/R-data/blob/master/COMTRADE/CodeBook_040510-Imp-RF-comtrade.md) за период с 2010 по 2016 гг. (в стоимостном выражении).  
+
+```{r Интерактивная картограмма, results = 'asis', message = F, cashe = T}
+# загрузка пакетов
+library('data.table')
+library('googleVis')
+# library('dplyr')
+library('leaflet')
+
+# загружаем файл с данными по импорту масла в РФ (2010 - 2015)
+fileURL <- 'https://raw.githubusercontent.com/aksyuk/R-data/master/COMTRADE/040510-Imp-RF-comtrade.csv'
+if (!file.exists('./data')) dir.create('./data')
+if (!file.exists('./data/040510-Imp-RF-comtrade.csv')) {
+    download.file(fileURL, './data/040510-Imp-RF-comtrade.csv')
+}
+
+# импортируем в объект формата data.frame
+DT <- data.table(read.csv('./data/040510-Imp-RF-comtrade.csv', 
+                 as.is = T))
+
+# оставляем только название страны и стоимость поставок...
+DT <- DT[, Reporter, Trade.Value.USD]
+# ...и суммируем по странам
+DT <- DT[, lapply(.SD, sum), by = Reporter]
+
+# объект: таблица исходных данных
+g.tbl <- gvisTable(data = DT, 
+                   options = list(width = 220, height = 400))
+# объект: интерактивная карта
+g.chart <- gvisGeoChart(data = DT, 
+                        locationvar = 'Reporter', 
+                        colorvar = 'Trade.Value.USD', 
+                        options = list(width = 500, 
+                                       height = 400, 
+                                       dataMode = 'regions'))
+# размещаем таблицу и карту на одной панели (слева направо)
+TG <- gvisMerge(g.tbl, g.chart, 
+                horizontal = TRUE, 
+                tableOptions = 'bgcolor=\"#CCCCCC\" cellspacing=10')
+# ПРОДОЛЖЕНИЕ КОДА ФАЙЛА "Maps_GVis.Rmd"
+
+# вставляем результат в html-документ
+print(TG, 'chart')
+```
+
+## Карта на основе leaflet  
+На этой карте показаны местоположения зданий Российской академии народного хозяйства и государственной службы при Президенте Российской Федерации в Москве. Увеличьте масштаб, чтобы развернуть юго-западный угол, где расположен главный кампус.   
+
+<!-- ПРОДОЛЖЕНИЕ КОДА ФАЙЛА "Maps_GVis.Rmd" -->
+```{r Карта на основе leaflet, , results = 'asis', message = F}
+# картинка-логотип для маркеров объекта
+fileURL <- 'https://raw.githubusercontent.com/aksyuk/Coursera_DDP/master/ranepa_logo.png'
+ranepa.icon <- makeIcon(iconUrl = fileURL, 
+                        iconWidth = 31*74/98,
+                        iconHeight = 31,
+                        iconAnchorX = 31*74/98 / 2,
+                        iconAnchorY = 16)
+
+# загружаем данные с характеристиками объектов
+fileURL <- 'https://raw.githubusercontent.com/aksyuk/Coursera_DDP/master/RANEPA_loc.csv'
+df <- read.table(fileURL, header = T, as.is = T, 
+                 sep = ';', dec = ',', fileEncoding = 'cp1251')
+
+# таблица с координатами
+RANEPA.loc <- df[, c('lat', 'lng')]
+
+# подписи к объектам с гиперссылками
+ranepa.sites <- paste0("<a href='", df[, 'hyperlink'], "'>", 
+                       df[, 'address_eng'], "</a></br><em>", 
+                       df[, 'address_ru'], "</em>")
+
+# создаём виджет с картой
+myMap <- RANEPA.loc %>% leaflet(width = 800, height = 800) %>% 
+addTiles() %>% addMarkers(icon = ranepa.icon, popup = ranepa.sites)
+
+# рисуем карту
+myMap
+```
+
+### Использованы пакеты R  
+<!-- ссылки получены функцией citation('имя_пакета')-->
+  
+1. Matt Dowle and Arun Srinivasan (2017). data.table: Extension of `data.frame`. R package version 1.10.4. https://CRAN.R-project.org/package=data.table  
+1. Markus Gesmann and Diego de Castillo. Using the Google Visualisation API with R. The R Journal, 3(2):40-44, December 2011.  
+1. Joe Cheng, Bhaskar Karambelkar and Yihui Xie (2017). leaflet: Create Interactive Web Maps with the JavaScript 'Leaflet' Library. R
+package version 1.1.0. https://CRAN.R-project.org/package=leaflet  
+
+### Источники данных   
+
+1. База данных международной торговли UN COMTRADE. URL: [https://comtrade.un.org/](https://comtrade.un.org/)    
+1. Официальный сайт РАНХиГС. URL: [http://www.ranepa.ru/lyceum/infrastruktura/korpusa-akademii](http://www.ranepa.ru/lyceum/infrastruktura/korpusa-akademii)  
+1. Веб-API Яндекс карт. URL: [https://yandex.ru/map-constructor/location-tool/](https://yandex.ru/map-constructor/location-tool/])  
