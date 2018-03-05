@@ -2,14 +2,13 @@
 title: "Интерактивные карты с GVis и leaflet"
 author: "Svetlana Aksyuk"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output: html_document
+output:
+  html_document:
+    smart: false
 ---
-
-<!-- ВЫШЕ И НИЖЕ КОД ФАЙЛА "Maps_GVis.Rmd" -->
 
 Перевод примера с [RPubs](http://rpubs.com/gallery/googleVis) на русский язык с изменениями и дополнениями.  
 
-<!-- ПРОДОЛЖЕНИЕ КОДА ФАЙЛА "Maps_GVis.Rmd" -->
 ## Интерактивная картограмма  
 Построена на [данных по импорту сливочного масла в РФ](https://github.com/aksyuk/R-data/blob/master/COMTRADE/CodeBook_040510-Imp-RF-comtrade.md) за период с 2010 по 2016 гг. (в стоимостном выражении).  
 
@@ -21,10 +20,10 @@ library('googleVis')
 library('leaflet')
 
 # загружаем файл с данными по импорту масла в РФ (2010 - 2015)
-fileURL <- 'https://raw.githubusercontent.com/aksyuk/R-data/master/COMTRADE/040510-Imp-RF-comtrade.csv'
+fileURL <- './data/040510-Imp-RF-comtrade.csv'
 if (!file.exists('./data')) dir.create('./data')
 if (!file.exists('./data/040510-Imp-RF-comtrade.csv')) {
-    download.file(fileURL, './data/040510-Imp-RF-comtrade.csv')
+    download.file(fileURL, 'https://github.com/aksyuk/R-data/blob/master/COMTRADE/040510-Imp-RF-comtrade.csv')
 }
 
 # импортируем в объект формата data.frame
@@ -50,7 +49,6 @@ g.chart <- gvisGeoChart(data = DT,
 TG <- gvisMerge(g.tbl, g.chart, 
                 horizontal = TRUE, 
                 tableOptions = 'bgcolor=\"#CCCCCC\" cellspacing=10')
-# ПРОДОЛЖЕНИЕ КОДА ФАЙЛА "Maps_GVis.Rmd"
 
 # вставляем результат в html-документ
 print(TG, 'chart')
@@ -59,10 +57,9 @@ print(TG, 'chart')
 ## Карта на основе leaflet  
 На этой карте показаны местоположения зданий Российской академии народного хозяйства и государственной службы при Президенте Российской Федерации в Москве. Увеличьте масштаб, чтобы развернуть юго-западный угол, где расположен главный кампус.   
 
-<!-- ПРОДОЛЖЕНИЕ КОДА ФАЙЛА "Maps_GVis.Rmd" -->
-```{r Карта на основе leaflet, , results = 'asis', message = F}
+```{r Карта на основе leaflet, results = 'asis', message = F}
 # картинка-логотип для маркеров объекта
-fileURL <- 'https://raw.githubusercontent.com/aksyuk/Coursera_DDP/master/ranepa_logo.png'
+fileURL <- './data/ranepa_logo.png'
 ranepa.icon <- makeIcon(iconUrl = fileURL, 
                         iconWidth = 31*74/98,
                         iconHeight = 31,
@@ -70,9 +67,9 @@ ranepa.icon <- makeIcon(iconUrl = fileURL,
                         iconAnchorY = 16)
 
 # загружаем данные с характеристиками объектов
-fileURL <- 'https://raw.githubusercontent.com/aksyuk/Coursera_DDP/master/RANEPA_loc.csv'
+fileURL <- './data/RANEPA_loc.csv'
 df <- read.table(fileURL, header = T, as.is = T, 
-                 sep = ';', dec = ',', fileEncoding = 'cp1251')
+                 sep = ';', dec = ',')
 
 # таблица с координатами
 RANEPA.loc <- df[, c('lat', 'lng')]
