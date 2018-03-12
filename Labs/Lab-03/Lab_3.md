@@ -38,31 +38,19 @@ font-family: 'Verdana'
 <div class = "footer-left" style = "font-size: 70%; color: white; width:50%;">ГУУ, ИИС, кафедра ММЭУ</div>
 <div class = "footer-right" style = "font-size: 70%; color: white; width:50%;">весенний семестр 2017/2018</div>
 
-План практики 
-========================================================
-
-- Приложение с гистограммами на данных iris    
-- Приложение с графиками разброса и модели на данных airquality  
-- Агрегирование данных средствами data.table и dplyr  
-- Приложение для интерактивной фильтрации и агрегирования данных по импорту масла в РФ  
-
-<!-- Нижний колонтитул -->
-
-<div class = "footer-left" style = "font-size: 70%;"><em>ДПВ "Аналитический пакет R": Приложения в пакете shiny</em></div>
-<div class = "footer-right" style = "font-size: 70%;">2</div>
-
 Приложения в shiny  
 ========================================================
 
 - Скрипт на R -> интерактивная html-страница  
 - Знание html необязательно  
 - Можно размещать онлайн на ресурсах Gist, shinyapps.io, публиковать как пакеты для R или просто отсылать архивом   
-- Примеры приложений: [https://shiny.rstudio.com/](https://shiny.rstudio.com/)
+- Примеры приложений: [https://shiny.rstudio.com/](https://shiny.rstudio.com/)   
+- Ещё примеры: [https://shiny.rstudio.com/gallery/](https://shiny.rstudio.com/gallery/)   
 
 <!-- Нижний колонтитул -->
 
 <div class = "footer-left" style = "font-size: 70%;"><em>ДПВ "Аналитический пакет R": Приложения в пакете shiny</em></div>
-<div class = "footer-right" style = "font-size: 70%;">3</div>
+<div class = "footer-right" style = "font-size: 70%;">2</div>
 
 Приложения в shiny  
 ========================================================
@@ -76,5 +64,17 @@ font-family: 'Verdana'
 <!-- Нижний колонтитул -->
 
 <div class = "footer-left" style = "font-size: 70%;"><em>ДПВ "Аналитический пакет R": Приложения в пакете shiny</em></div>
-<div class = "footer-right" style = "font-size: 70%;">4</div>
+<div class = "footer-right" style = "font-size: 70%;">3</div>
 
+План практики 
+========================================================
+
+- Приложение с гистограммами на данных iris    
+- Приложение с графиками разброса и модели на данных airquality  
+- Агрегирование данных средствами data.table и dplyr  
+- Приложение для интерактивной фильтрации и агрегирования данных по импорту масла в РФ  
+
+<!-- Нижний колонтитул -->
+
+<div class = "footer-left" style = "font-size: 70%;"><em>ДПВ "Аналитический пакет R": Приложения в пакете shiny</em></div>
+<div class = "footer-right" style = "font-size: 70%;">4</div>

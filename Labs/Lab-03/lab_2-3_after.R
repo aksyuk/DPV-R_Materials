@@ -30,6 +30,25 @@ library('zoo')                 # работа с датами, as.yearmon()
 # все уникальные значения видов ирисов
 unique(iris$Species)
 
+# список уникальных значений столбца Species для фильтрации данных
+sp.filter <- as.character(unique(iris$Species))
+names(sp.filter) <- sp.filter
+sp.filter <- as.list(sp.filter)
+sp.filter
+
+# количество интервалов для гистограммы
+hist.int <- 3
+
+# гистограммы характеристик ириса
+# сначала фильтруем данные
+DF <- iris[iris$Species == sp.filter[1], 1:4]
+# затем строим гистограммы переменных
+histogram( ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width, 
+           data = DF,
+           xlab = '',
+           breaks = seq(min(DF), max(DF), 
+                        length = hist.int + 1))
+
 # создать папку для файлов приложения
 if (!file.exists('./iris_hist_app')) {
     dir.create('./iris_hist_app')}
