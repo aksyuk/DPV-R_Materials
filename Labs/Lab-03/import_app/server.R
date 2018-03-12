@@ -1,5 +1,4 @@
-# загрузка пакетов
-library('shiny')
+library('shiny')              # загрузка пакетов
 library('dplyr')
 library('data.table')
 library('zoo')
@@ -15,10 +14,13 @@ if (!file.exists('./data/040510-Imp-RF-comtrade.csv')) {
     download.file(fileURL, './data/040510-Imp-RF-comtrade.csv')}
 # читаем данные из загруженного .csv во фрейм
 DT.import <- data.table(read.csv('./data/040510-Imp-RF-comtrade.csv', as.is = T))
-# переводим период в дату: КОНЕЦ соответствующего месяца
-DT.import[, Period.Date := ceiling_date(as.POSIXct(as.yearmon(as.character(Period), 
-                                                              '%Y%m')),
-                                        unit = 'month') - days(1)]
+# переводим период в дату: начало соответствующего месяца
+#  нелогично, но ceiling_date, с помощью которого дата округлялась 
+#  до следующего месяца ранее, выдаёт ошибку: не распознаёт timezone
+DT.import[, Period.Date := 
+              as.POSIXct(as.yearmon(as.character(Period), 
+                                    '%Y%m'))]
+
 # убираем столбец с периодом в виде текста, оставляем только дату
 DT.import <- select(DT.import, Period.Date, Reporter, Trade.Value.USD)
 
@@ -33,28 +35,40 @@ shinyServer(function(input, output) {
     })
     # реагирующая таблица данных
     DT <- reactive({
+        # фильтруем по годам
+        DT <- filter(DT.import, between(year(Period.Date), 
+                                        input$year.range[1],
+                                        input$year.range[2]))
         # агрегируем
         if (input$period.name == 'Месяц') {
-            DT <- filter(DT.import, Reporter == input$state) %>% 
+            DT <- filter(DT, Reporter == input$state) %>% 
                 mutate(period = as.yearmon(Period.Date))
         } else {
-            DT <- filter(DT.import, Reporter == input$state) %>%
+            DT <- filter(DT, Reporter == input$state) %>%
                 mutate(period = as.yearqtr(Period.Date))
         }
         DT <- DT %>% group_by(period) %>% 
             mutate(Trade.Value.USD = sum(Trade.Value.USD))
         DT <- data.table(DT)
-        # оставляем только уникальные периоды времени
+        # добавляем ключевой столбец: период времени
         setkey(DT, 'period')
-        unique(DT)
+        # оставляем только уникальные периоды времени
+        DT <- data.table(unique(DT))
     })
 
+    # текст: выбрана страна
     output$text <- renderText({input$state}) 
     
-    # график временного ряда
+    # график динамики
     output$ts.plot <- renderPlot({
-        gp <- ggplot(DT(), aes(x = as.POSIXct(period), y = Trade.Value.USD))
-        gp + geom_line() + geom_point()
+        gp <- ggplot(DT(), aes(x = period, y = Trade.Value.USD))
+        if (input$period.name == 'Месяц') {
+            gp + geom_histogram(stat = 'identity') + 
+                scale_x_yearmon(format = "%b %Y")            
+        } else {
+            gp + geom_histogram(stat = 'identity') + 
+                scale_x_yearqtr(format = "%YQ%q")            
+        }
     })
     
     # таблица данных в отчёте
@@ -65,12 +79,14 @@ shinyServer(function(input, output) {
     # событие "нажатие на кнопку 'сохранить'"
     observeEvent(input$save.csv, {
         if (input$period.name == 'Месяц') {
-            file.name <- paste('import_from_', input$state, '_by_month.csv', 
-                               sep = '')
+            by.string <- '_by_mon_'
         } else {
-            file.name <- paste('import_from_', input$state, '_by_qrt.csv', 
-                               sep = '')
+            by.string <- '_by_qrt_'
         }
+        file.name <- paste('import_', input$year.range[1], '-',
+                           input$year.range[2], by.string, 'from_',
+                           input$state, '.csv', 
+                           sep = '')
         # файл будет записан в директорию приложения
         write.csv(DT(), file = file.name, 
                   fileEncoding = 'UTF-8', row.names = F)

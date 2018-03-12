@@ -10,13 +10,14 @@
 
 # загрузка пакетов
 library('shiny')               # создание интерактивных приложений
-
 library('lattice')             # графики lattice
 library('data.table')          # работаем с объектами "таблица данных"
 library('ggplot2')             # графики ggplot2
 library('dplyr')               # трансформации данных
 library('lubridate')           # работа с датами, ceiling_date()
 library('zoo')                 # работа с датами, as.yearmon() 
+
+
 
 # Пример 1 #####################################################################
 
@@ -28,6 +29,25 @@ library('zoo')                 # работа с датами, as.yearmon()
 ?iris
 # все уникальные значения видов ирисов
 unique(iris$Species)
+
+# список уникальных значений столбца Species для фильтрации данных
+sp.filter <- 
+names(sp.filter) <- 
+sp.filter <- 
+sp.filter
+
+# количество интервалов для гистограммы
+hist.int <- 
+
+# гистограммы характеристик ириса
+# сначала фильтруем данные
+DF <- 
+# затем строим гистограммы переменных
+histogram( ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width, 
+           data = DF,
+           xlab = '',
+           breaks = seq(min(DF), max(DF), 
+                        length = hist.int + 1))
 
 # создать папку для файлов приложения
 if (!file.exists('./iris_hist_app')) {
@@ -43,14 +63,11 @@ if (!file.exists('./iris_hist_app/server.R')) {
 
 # ДАЛЬШЕ ИЗМЕНЯЕМ ФАЙЛЫ ПРИЛОЖЕНИЯ: ui.R и server.R
 
-
-
-
-
-
 # запустить приложение
 runApp('./iris_hist_app', launch.browser = T,
        display.mode = 'showcase')
+
+
 
 # Пример 2 #####################################################################
 
@@ -68,15 +85,24 @@ names(airquality)
 DT <- data.table(airquality)
 DT[, .N, by = Month]
 
+# создаём и фильтруем таблицу данных
+DT <- 
+DT <- 
+    
+# строим график
+gp <- 
+    
+gp <- 
+gp
+
 # СКАЧИВАЕМ, РАСПАКОВЫВАЕМ в папку ./air_plot_app 
 #  И ИЗМЕНЯЕМ ФАЙЛЫ ПРИЛОЖЕНИЯ: ui.R и server.R
-
-
-
 
 # запустить приложение
 runApp('./air_plot_app', launch.browser = T,
        display.mode = 'showcase')
+
+
 
 # Часть 2: Трансформация и агрегирование данных --------------------------------
 
@@ -102,19 +128,23 @@ if (!exists('DT.import')){
 # добавляем условие на отбор строк функцией filter
 
 
+
 # рассчитать суммарную массу поставок по каждой стране
 
 
-# переводим период в дату: КОНЕЦ соответствующего месяца
 
 
+# переводим период в дату: начало соответствующего месяца
+DT.import[, Period.Date := as.POSIXct(as.yearmon(as.character(Period), 
+                                                 '%Y%m'))]
 # что получилось
-
+DT.import[, c('Period', 'Period.Date'), with = F]
 
 # убираем столбец с периодом в виде текста, оставляем дату
-
-
+DT.import <- select(DT.import, Period.Date, Reporter, 
+                    Reporter, Trade.Value.USD)
 # смотрим результат
+head(DT.import, n = 3)
 
 
 

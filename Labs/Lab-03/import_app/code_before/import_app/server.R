@@ -1,5 +1,4 @@
-# загрузка пакетов
-library('shiny')
+library('shiny')              # загрузка пакетов
 library('dplyr')
 library('data.table')
 library('zoo')
@@ -31,14 +30,40 @@ shinyServer(function(input, output) {
                      'Выберите торгового партнёра:', state.list, 
                      selected = state.list[1])
     })
-    # !!! реагирующая таблица данных
-    DT <- 
-    
-    # график временного ряда
-    output$ts.plot <- renderPlot({
-        gp <- ggplot(DT(), aes(x = as.POSIXct(period), y = Trade.Value.USD))
-        gp + geom_line() + geom_point()
+    # реагирующая таблица данных
+    DT <- reactive({
+        # агрегируем
+        if (input$period.name == 'Месяц') {
+            DT <- 
+                
+        } else {
+            DT <- 
+                
+        }
+        DT <- 
+            
+        DT <- data.table(DT)
+        # добавляем ключевой столбец: период времени
+        setkey(DT, 'period')
+        # оставляем только уникальные периоды времени
+        unique(DT)
     })
+    
+    # текст: выбрана страна
+    output$text <- renderText({input$state}) 
+        
+    # график динамики
+    output$ts.plot <- renderPlot({
+        gp <- 
+        if (input$period.name == 'Месяц') {
+            gp + geom_histogram(stat = 'identity') + 
+                scale_x_yearmon(format = "%b %Y")
+        } else {
+            gp + geom_histogram(stat = 'identity') + 
+                scale_x_yearqtr(format = "%YQ%q")
+        }
+    })
+    
     
     # таблица данных в отчёте
     output$table <- renderDataTable({
@@ -48,12 +73,14 @@ shinyServer(function(input, output) {
     # событие "нажатие на кнопку 'сохранить'"
     observeEvent(input$save.csv, {
         if (input$period.name == 'Месяц') {
-            file.name <- paste('import_from_', input$state, '_by_month.csv', 
-                               sep = '')
+            by.string <- '_by_mon_'
         } else {
-            file.name <- paste('import_from_', input$state, '_by_qrt.csv', 
-                               sep = '')
+            by.string <- '_by_qrt_'
         }
+        file.name <- paste('import_', input$year.range[1], '-',
+                           input$year.range[2], by.string, 'from_',
+                           input$state, '.csv', 
+                           sep = '')
         # файл будет записан в директорию приложения
         write.csv(DT(), file = file.name, 
                   fileEncoding = 'UTF-8', row.names = F)

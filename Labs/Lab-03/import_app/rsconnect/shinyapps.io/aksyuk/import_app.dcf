@@ -1,0 +1,13 @@
+name: import_app
+title: import_app
+username:
+account: aksyuk
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 87828
+bundleId: 1264429
+url: https://aksyuk.shinyapps.io/import_app/
+when: 1520863636.94839
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: code_before/import_app/server.R|code_before/import_app/ui.R

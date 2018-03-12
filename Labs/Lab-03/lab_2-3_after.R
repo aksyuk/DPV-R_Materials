@@ -11,8 +11,8 @@
 # загрузка пакетов
 library('shiny')               # создание интерактивных приложений
 library('lattice')             # графики lattice
-library('ggplot2')             # графики ggplot2
 library('data.table')          # работаем с объектами "таблица данных"
+library('ggplot2')             # графики ggplot2
 library('dplyr')               # трансформации данных
 library('lubridate')           # работа с датами, ceiling_date()
 library('zoo')                 # работа с датами, as.yearmon() 
@@ -69,8 +69,6 @@ runApp('./iris_hist_app', launch.browser = T,
 
 
 
-
-
 # Пример 2 #####################################################################
 
 # Создать приложение, которое строит график разброса, таблицу описательных 
@@ -87,16 +85,22 @@ names(airquality)
 DT <- data.table(airquality)
 DT[, .N, by = Month]
 
+# создаём и фильтруем таблицу данных
+DT <- data.table(airquality)
+DT <- select(DT[between(Month, 5, 7), ], Solar.R, Wind, Month)
+
+# строим график
+gp <- ggplot(data = DT, 
+             aes_string(x = 'Solar.R', y = 'Wind'))
+gp <- gp + geom_point() + geom_smooth(method = 'lm')
+gp
+
 # СКАЧИВАЕМ, РАСПАКОВЫВАЕМ в папку ./air_plot_app 
 #  И ИЗМЕНЯЕМ ФАЙЛЫ ПРИЛОЖЕНИЯ: ui.R и server.R
-
-
 
 # запустить приложение
 runApp('./air_plot_app', launch.browser = T,
        display.mode = 'showcase')
-
-
 
 
 
@@ -130,10 +134,9 @@ select(DT.import, Reporter, Trade.Value.USD) %>%
     group_by(Reporter) %>% 
     mutate(Trade.Value.USD.by.country = sum(Trade.Value.USD))
 
-# переводим период в дату: КОНЕЦ соответствующего месяца
-DT.import[, Period.Date := ceiling_date(as.POSIXct(as.yearmon(as.character(Period), 
-                                                              '%Y%m')),
-                                        unit = 'month') - days(1)]
+# переводим период в дату: начало соответствующего месяца
+DT.import[, Period.Date := as.POSIXct(as.yearmon(as.character(Period), 
+                                                              '%Y%m'))]
 # что получилось
 DT.import[, c('Period', 'Period.Date'), with = F]
 
@@ -142,6 +145,8 @@ DT.import <- select(DT.import, Period.Date, Reporter,
                     Reporter, Trade.Value.USD)
 # смотрим результат
 head(DT.import, n = 3)
+
+
 
 # Пример 4 #####################################################################
 
@@ -153,8 +158,6 @@ head(DT.import, n = 3)
 
 # СКАЧИВАЕМ, РАСПАКОВЫВАЕМ в папку ./import_app 
 #  И ИЗМЕНЯЕМ ФАЙЛЫ ПРИЛОЖЕНИЯ: ui.R и server.R
-
-
 
 
 # запустить приложение
