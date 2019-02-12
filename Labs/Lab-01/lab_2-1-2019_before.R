@@ -24,39 +24,28 @@ library('dplyr')     # инструменты трансформирования
 fileURL <- 'https://raw.githubusercontent.com/aksyuk/R-data/master/COMTRADE/040510-Imp-RF-comtrade.csv'
 
 # создаём директорию для данных, если она ещё не существует:
-data.dir <- './data'
-if (!file.exists(data.dir)) {
-    dir.create(data.dir)
-}
+data.dir <- 
+
 
 # создаём файл с логом загрузок, если он ещё не существует:
 log.filename <- './data/download.log'
-if (!file.exists(log.filename)) {
-    file.create(log.filename)
-}
+
 
 # загружаем файл, если он ещё не существует,
 #  и делаем запись о загрузке в лог:
-if (!file.exists('./data/040510-Imp-RF-comtrade.csv')) {
-    download.file(fileURL, 
-                  './data/040510-Imp-RF-comtrade.csv')
-    # сделать запись в лог
-    write(paste('Файл "040510-Imp-RF-comtrade.csv" загружен', 
-                Sys.time()), 
-          file = log.filename, append = T)
-}
+log.filename <- './data/download.log'
+
 
 # читаем данные из загруженного .csv во фрейм, 
 #  если он ещё не существует
 if (!exists('DF.import')){
-    DF.import <- read.csv('./data/040510-Imp-RF-comtrade.csv', 
-                          stringsAsFactors = F)    
+    DF.import <-    
 }
 # предварительный просмотр
-dim(DF.import)     # размерность таблицы
-str(DF.import)     # структура (характеристики столбцов)
-head(DF.import)    # первые несколько строк таблицы
-tail(DF.import)    # последние несколько строк таблицы
+
+
+
+
 
 # справочник к данным
 # https://github.com/aksyuk/R-data/blob/master/COMTRADE/CodeBook_040510-Imp-RF-comtrade.md
@@ -70,54 +59,52 @@ tail(DF.import)    # последние несколько строк табли
 fileURL <- 'https://www.w3schools.com/xml/simple.xml'
 
 # загружаем содержимое в объект doc
-doc <- getURL(fileURL)
+doc <- 
 
 # разбираем объект как XML
-doc <- xmlTreeParse(doc, useInternalNodes = T)
+doc <- 
 
 # просмотр загруженного документа
 # ВНИМАНИЕ: не повторять для больших страниц!
 doc
 
 # корневой элемент XML-документа  
-rootNode <- xmlRoot(doc)  
+rootNode <-  
 
 # имя корневого тега  
-xmlName(rootNode)  
+ 
 
 # объект rootNode относится к специальному типу «XML запись»  
-class(rootNode)  
+ 
 
 # имена тегов, дочерних к корню (именованный вектор)  
-names(rootNode)  
+  
 
 # первый элемент дерева (обращаемся как к элементу списка)  
-rootNode[[1]]  
+ 
 
 # первый потомок первого потомка корневого тега...  
-rootNode[[1]][[1]]  
+ 
 
 # ...и его содержимое  
-xmlValue(rootNode[[1]][[1]])  
+ 
 
 # извлечь все значения из потомков в XML-записи  
-values.all <- xmlSApply(rootNode, xmlValue)  
+values.all <-  
 
 # просмотреть первые два элемента  
-values.all[1:2]  
+  
 
 # вытащить содержимое тегов "name" на любом уровне
-xpathSApply(rootNode, "//name", xmlValue)
+
 
 # вытащить содержимое тегов "price" на любом уровне
-xpathSApply(rootNode, "//price", xmlValue)
+
 
 # разобрать XML-страницу и собрать данные в таблицу
-DF.food <- xmlToDataFrame(rootNode, stringsAsFactors = F)
+DF.food <- 
 # предварительный просмотр
-dim(DF.food)     # размерность таблицы
 
-str(DF.food)     # структура (характеристики столбцов)
 
 
 # Пример 3 #####################################################################
@@ -126,10 +113,10 @@ str(DF.food)     # структура (характеристики столбц
 #  валютам, на последнюю дату установления 
 fileURL <- 'http://www.nbrb.by/Services/XmlExRates.aspx?period=1'
 # загружаем содержимое в объект doc
-doc <- xmlTreeParse(fileURL, useInternalNodes = T)
+doc <- 
 
 # корневой элемент
-rootNode <- xmlRoot(doc)
+rootNode <- 
 # класс объекта rootNode
 class(rootNode)
 
@@ -138,9 +125,9 @@ xmlName(rootNode)
 # вытаскиваем имена всех тегов документа (*)
 #  на любом уровне иерархии (//)
 
-tag <- xpathSApply(rootNode, "//*", xmlName)
+tag <- 
 # оставляем только уникальные
-tag <- unique(tag)
+tag <- 
 
 # считаем их количество
 length(tag)
@@ -149,24 +136,23 @@ length(tag)
 tag
 
 # вытаскиваем все значения из тегов "CharCode"
-cur <- xpathSApply(rootNode, "//CharCode", xmlValue)
+cur <- 
 
 # считаем количество уникальных
 length(unique(cur))
 
 # превращаем XML во фрем
-DF.BYB <- xmlToDataFrame(rootNode, stringsAsFactors = F)
+DF.BYB <- 
 # предварительный просмотр
 dim(DF.food)     # размерность таблицы
-
 str(DF.food)     # структура (характеристики столбцов)
 
 # извлекаем дату
-BYB.date <- xpathSApply(rootNode, "//*[@Date]", xmlAttrs)
+BYB.date <- 
 BYB.date
 
 # добавляем даты во фрейм
-DF.BYB$Date.chr <- rep(BYB.date, dim(DF.BYB)[1])
+DF.BYB$Date.chr <- 
 
 # снова проверяем структуру фрейма
 str(DF.BYB)
@@ -180,13 +166,13 @@ str(DF.BYB)
 fileURL <- "https://yandex.ru/search/?lr=37141&text=%D0%B8%D0%BC%D0%BF%D0%BE%D1%80%D1%82%20%D0%B2%20%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D1%8E"
 
 # загружаем текст html-страницы
-html <- getURL(fileURL)
+html <- 
 
 # разбираем как html
-doc <- htmlTreeParse(html, useInternalNodes = T)
+doc <- 
 
 # корневой элемент
-rootNode <- xmlRoot(doc)
+rootNode <- 
 
 # выбираем все заголовки результатов запроса
 h <- xpathSApply(rootNode, '//li[@class="serp-item"]//div[contains(@class, "organic__url-text")]/following::a[contains(@class, "organic__url")]', 
@@ -200,11 +186,10 @@ s <- xpathSApply(rootNode, '//li[@class="serp-item"]//div[contains(@class, "orga
 # просмотр первых трёх элементов вектора
 s[1:3]
 
-DF.news <- data.frame(Header = h, Source = s, stringsAsFactors = F)
+DF.news <- 
 
 # просмотр результата
 dim(DF.news)                  # размерность
-
 str(DF.news)                  # структура
 
 
@@ -217,21 +202,21 @@ str(DF.news)                  # структура
 # адрес справочника по странам UN COMTRADE
 fileURL <- "http://comtrade.un.org/data/cache/partnerAreas.json"
 # загружаем данные из формата JSON
-reporters <- fromJSON(file = fileURL)
+reporters <- 
 is.list(reporters)
 
 # соединяем элементы списка построчно
-reporters <- t(sapply(reporters$results, rbind))
+reporters <- 
 dim(reporters)
 
 # превращаем во фрейм
-reporters <- as.data.frame(reporters)
+reporters <- 
 head(reporters)
 
 # даём столбцам имена
 names(reporters) <- c('State.Code', 'State.Name.En')
 # находим РФ
-reporters[reporters$State.Name.En == 'Russian Federation', ]
+
 
 # функция, реализующая API (источник: UN COMTRADE)
 source("https://raw.githubusercontent.com/aksyuk/R-data/master/API/comtrade_API.R")
@@ -245,7 +230,7 @@ dim(s1$data)
 is.data.frame(s1$data)
 
 # записываем выборку за 2010 год в файл
-write.csv(s1$data, './data/comtrade_2010.csv', row.names = F)
+
 
 # загрузка данных в цикле
 for (i in 2011:2018) {
@@ -282,10 +267,10 @@ for (i in 2011:2018) {
 url <- 'http://www.imdb.com/search/title?count=100&release_date=2016,2016&title_type=feature'
 
 # читаем HTML страницы
-webpage <- read_html(url)
+webpage <- 
 
 # скраппим страницу по селектору и преобразуем в текст
-rank_data <- html_nodes(webpage, '.text-primary') %>% html_text
+rank_data <- 
 # размер вектора
 length(rank_data)
 # первые шесть рангов
@@ -308,7 +293,7 @@ description_data <- html_nodes(webpage, '.ratings-bar+ .text-muted') %>% html_te
 length(description_data)
 head(description_data)
 # предобработка: убираем перенос строки
-description_data <- gsub('\n', '', description_data)
+
 # окончательный результат
 length(description_data)
 head(description_data)
@@ -319,8 +304,8 @@ runtime_data <- html_nodes(webpage, '.text-muted .runtime') %>% html_text
 length(runtime_data)
 head(runtime_data)
 # предобработка: убираем 'min' и превращаем в числа
-runtime_data <- gsub(' min', '', runtime_data)
-runtime_data <- as.numeric(runtime_data)
+
+
 # окончательный результат
 length(runtime_data)
 head(runtime_data)
@@ -331,9 +316,9 @@ genre_data <- html_nodes(webpage, '.genre') %>% html_text
 length(genre_data)
 head(genre_data)
 # предобработка: убираем перенос строки
-genre_data <- gsub('\n', '', genre_data)
+
 # оставляем только первый жанр для каждого фильма
-genre_data <- gsub(',.*', '', genre_data)
+
 # окончательный результат
 length(genre_data)
 head(genre_data)
@@ -355,7 +340,7 @@ votes_data <- html_nodes(webpage, '.sort-num_votes-visible span:nth-child(2)') %
 length(votes_data)
 head(votes_data)
 # предобработка: убираем запятые
-votes_data <- gsub(',', '', votes_data)
+
 # предобработка: преобразуем в числа
 votes_data <- as.numeric(votes_data)
 # окончательный результат
@@ -382,22 +367,22 @@ length(metascore_data)
 # функция перебора тегов внутри тегов более высокого уровня
 get_tags <- function(node){
     # найти все теги с метарейтингом
-    raw_data <- html_nodes(node, selector) %>% html_text
+    
     # значения нулевой длины (для фильма нет такого тега) меняем на пропуски
-    data_NAs <- ifelse(length(raw_data) == 0, NA, raw_data)
+    
 }
 
 # это глобальная переменная будет неявно передана функции get_tags()
 selector <- '.ratings-metascore'
 # находим все ноды (теги) верхнего уровня, с информацией о каждом фильме
-doc <- html_nodes(webpage, '.lister-item-content')
+doc <- 
 # применяем к этим тегам поиск метарейтинга и ставим NA там, где тега нет
-metascore_data <- sapply(doc, get_tags)
+metascore_data <- 
 # предварительный результат
 length(metascore_data)
 head(metascore_data)
 # чистим данные
-metascore_data <- as.numeric(gsub('Metascore|\n| ', '', metascore_data))
+
 # окончательный результат
 length(metascore_data)
 head(metascore_data)
@@ -409,7 +394,7 @@ gross_data <- sapply(doc, get_tags)
 length(gross_data)
 head(gross_data)
 # преобразуем в числа
-gross_data <- as.numeric(gsub('M|[$]', '', gross_data))
+
 # окончательный результат
 length(gross_data)
 head(gross_data)
@@ -429,4 +414,4 @@ str(DF_movies)
 write.csv(DF_movies, file = 'top100-IMDB-2016.csv', row.names = F)
 # сделать запись в лог
 write(paste('Файл "top100-IMDB-2016.csv" записан', Sys.time()), 
-      file = log.filename, append = T)
+      file = './data/download.log', append = T)
