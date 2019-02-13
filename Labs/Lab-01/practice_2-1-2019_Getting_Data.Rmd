@@ -2,12 +2,13 @@
 title: "Аналитический пакет R. Загрузка и предобработка данных"
 author: "С.А.Суязова (Аксюк), [s.aksuk@kiber-guu.ru](mailto:s.aksuk@kiber-guu.ru)"
 date: "`r format(Sys.time(), '%d %b, %Y')`"
+tags: "R[^1], r-project, RStudio"  
 output:
   word_document:
     pandoc_args: ["--smart"]
     reference_docx: ../Шаблон.docx
+    toc: yes
 ---
-\newline
 
 Ключевые слова: R[^1], r-project, RStudio  
 
@@ -19,7 +20,7 @@ output:
 
 Все ссылки действительны на 12 февраля 2019 г.  
 
-Файл с макетом кода для этой практики: [lab_2-1_before.R]  
+Файл с макетом кода для этой практики: [lab_2-1_before.R](DPV-R_Materials/Labs/Lab-01/lab_2-1-2019_before.R)  
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -34,7 +35,7 @@ comma <- function(x) {
 }
 ```
 
-\newline
+##### Новая страница    
 
 ## Несколько полезных привычек       
 
@@ -755,9 +756,9 @@ dim(DF_movies)
 str(DF_movies)
 
 # записываем в .csv
-write.csv(DF_movies, file = 'top100-IMDB-2016.csv', row.names = F)
+write.csv(DF_movies, file = './data/top100-IMDB-2016.csv', row.names = F)
 # сделать запись в лог
-write(paste('Файл "top100-IMDB-2016.csv" записан', Sys.time()), 
+write(paste('Файл "./data/top100-IMDB-2016.csv" записан', Sys.time()), 
       file = './data/download.log', append = T)
 ```
 
@@ -790,6 +791,8 @@ write(paste('Файл "top100-IMDB-2016.csv" записан', Sys.time()),
 1. Яндекс.Маркет, холодильники (Москва)  
 
 1. Яндекс.Маркет, роботы-пылесосы (Москва)  
+
+1. Кинопоиск, топ-100 за 2018 год  
 
 
 [^1]: R Core Team (2015). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. URL <https://www.R-project.org/>  
