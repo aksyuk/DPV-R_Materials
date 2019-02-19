@@ -697,4 +697,4 @@ write.csv(DT, './data/040510-Imp-RF-comtrade.csv', row.names = F)
 
 [^9]: M Dowle, A Srinivasan, T Short, S Lianoglou with contributions from R Saporta, E Antonyan. Package 'data.table' Reference Manual, September 19, 2015. URL: <https://cran.r-project.org/web/packages/data.table/data.table.pdf>   
 
-[^10]: 2.	Jeffrey Leek. Материалы курса "Getting and Cleaning Data" Университета Джонса Хопкинса на портале coursera.org, доступные в репозитории на github.com: <https://github.com/jtleek/modules/tree/master/03_GettingData>   
+[^10]: Jeffrey Leek. Материалы курса "Getting and Cleaning Data" Университета Джонса Хопкинса на портале coursera.org, доступные в репозитории на github.com: <https://github.com/jtleek/modules/tree/master/03_GettingData>   

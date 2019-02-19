@@ -1,5 +1,5 @@
 ---
-title: "Аналитический пакет R. Загрузка и предобработка данных"
+title: "Аналитический пакет R. Загрузка данных"
 author: "С.А.Суязова (Аксюк), [s.aksuk@kiber-guu.ru](mailto:s.aksuk@kiber-guu.ru)"
 date: "`r format(Sys.time(), '%d %b, %Y')`"
 tags: "R[^1], r-project, RStudio"  
