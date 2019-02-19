@@ -20,7 +20,7 @@ output:
 
 Все ссылки действительны на 12 февраля 2019 г.  
 
-Файл с макетом кода для этой практики: [lab_2-1_before.R](DPV-R_Materials/Labs/Lab-01/lab_2-1-2019_before.R)  
+Файл с макетом кода для этой практики: [lab_2-1_before.R](https://github.com/aksyuk/DPV-R_Materials/blob/master/Labs/Lab-01/lab_2-1-2019_after.R)  
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
