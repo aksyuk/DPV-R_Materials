@@ -1,0 +1,123 @@
+<style>
+
+.footer-left {  
+    position: fixed;  
+    top: 95%;  
+    left: 0%;  
+    text-align: left;  
+    width:85%;  
+}  
+  
+.footer-right {  
+    position: fixed;  
+    top: 95%;  
+    right: 0%;  
+    text-align: right;  
+    width:15%;  
+}  
+  
+.col2 {  
+    columns: 2 200px;           /* number of columns and width in pixels*/
+    -webkit-columns: 2 200px;   /* chrome, safari */
+    -moz-columns: 2 200px;      /* firefox */
+}  
+  
+</style>
+
+ДПВ "Аналитический пакет R"
+========================================================
+autosize: true
+font-family: 'Verdana'
+
+## Практика 3:  
+## <center>Графические системы R</center>
+
+```{r Подготовка рабочего пространства, include = F}
+library('knitr')
+
+# для колонтитулов: слева -- название лекции...
+str.footer.left <- 'ДПВ "Аналитический пакет R": Графические системы R'
+# ...справа -- номер страницы (счётчик на каждом слайде)
+slide.number <- 1
+
+```
+
+<!-- Нижний колонтитул -->
+<div class = "footer-left" style = "font-size: 70%; color: white; width:50%;">ГУУ, ИИС, кафедра ММЭУ</div>
+<div class = "footer-right" style = "font-size: 70%; color: white; width:50%;">весенний семестр 2018/2019</div>
+
+Графические системы  
+========================================================
+
+- Базовая графика: (пакет `base`)   
+- Пакет `lattice`   
+- Пакет `ggplot2`   
+
+<!-- Нижний колонтитул -->
+```{r include = F}
+slide.number <- slide.number + 1
+```
+<div class = "footer-left" style = "font-size: 70%;"><em>`r str.footer.left`</em></div>
+<div class = "footer-right" style = "font-size: 70%;">`r slide.number`</div>
+
+Базовая графика   
+========================================================
+
+- подходит для быстрого предварительного анализа данных   
+- функции высокого (`plot()`, `boxplot()`) и низкого (`abline()`, `points()`, `lines()`) уровней   
+- элементы можно добалять на график с помощью функций низкого уровня  
+- базовые функции -- кирпичики, с помощью которых можно нарисовать всё   
+- очень длинные скрипты
+
+<!-- Нижний колонтитул -->
+```{r include = F}
+slide.number <- slide.number + 1
+```
+<div class = "footer-left" style = "font-size: 70%;"><em>`r str.footer.left`</em></div>
+<div class = "footer-right" style = "font-size: 70%;">`r slide.number`</div>
+
+
+Пакет lattice 
+========================================================
+
+- оптимизирован для визуализации данных с большим количеством признаков (multivariate data)   
+- один график -- одна функция  
+- нельзя дорисовывать элементы на график   
+- графики красивее, чем базовые, но оформление отдельных элементов сложно изменять   
+
+<!-- Нижний колонтитул -->
+```{r include = F}
+slide.number <- slide.number + 1
+```
+<div class = "footer-left" style = "font-size: 70%;"><em>`r str.footer.left`</em></div>
+<div class = "footer-right" style = "font-size: 70%;">`r slide.number`</div>
+
+
+Пакет ggplot2 
+========================================================
+
+- реализует грамматрику работы с данными   
+- есть фунции-подлежащие и функции-сказуемые   
+- график создаётся слоями, соответствующие функции суммируются    
+- график хранится в виде объекта рабочего пространства   
+- сложные графики на больших объёмах данных требуют дополнительного места и могут подвисать   
+
+<!-- Нижний колонтитул -->
+```{r include = F}
+slide.number <- slide.number + 1
+```
+<div class = "footer-left" style = "font-size: 70%;"><em>`r str.footer.left`</em></div>
+<div class = "footer-right" style = "font-size: 70%;">`r slide.number`</div>
+
+План практики 
+========================================================
+
+- Работаем с графическими пакетами `base`, `lattice`, `ggplot2`   
+- Заполняем пропуски в данных разными способами   
+
+<!-- Нижний колонтитул -->
+```{r include = F}
+slide.number <- slide.number + 1
+```
+<div class = "footer-left" style = "font-size: 70%;"><em>`r str.footer.left`</em></div>
+<div class = "footer-right" style = "font-size: 70%;">`r slide.number`</div>
