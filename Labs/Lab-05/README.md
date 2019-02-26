@@ -1,22 +1,36 @@
 
-# Создание динамических карт      
+# Создание статических картограмм      
 
-<span style="color:#000099">**Лабораторная работа №5**</span>
+<span style="color:#000099">**Лабораторная работа №4**</span>
 
-### Динамические карты      
+### Создание статических карт в R      
 
-* Карты в пакете `googleVis`    
-* Карты в пакете `leaflet`    
+* Коротко о форматах хранения геоданных    
+* Пример работы с растровой картой   
+* Работа с векторной картой    
 
-### Упражнение 5   
-Отчёт (html) с картами: 
-1. Хороплет на `googleVis` по статистике Всемирного банка для стран; 
-2. Карта минимум с пятью объектами на уровне улиц.     
+### Упражнение 4   
+Создание хороплет-карт регионов РФ.     
 
 ### Источники   
 
 1. R Core Team (2015). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. URL [https://www.R-project.org/](https://www.R-project.org/)   
+1. GIS file formats / from Wikipedia, the free encyclopedia. URL: [https://en.wikipedia.org/wiki/GIS_file_formats](https://en.wikipedia.org/wiki/GIS_file_formats)   
+1. Robert J. Hijmans. Introduction to the 'raster' package (version 2.5-2) December 18, 2015. URL: [https://cran.r-project.org/web/packages/raster/vignettes/Raster.pdf](https://cran.r-project.org/web/packages/raster/vignettes/Raster.pdf)   
+1. Package ‘rgdal’. December 21, 2015 / CRAN. URL: [https://cran.r-project.org/web/packages/rgdal/rgdal.pdf](https://cran.r-project.org/web/packages/rgdal/rgdal.pdf)   
+1. Robin Lovelace, James Cheshire and others. Introduction to visualising spatial data in R V. 1.2, June, 2015. URL: [ftp://cran.r-project.org/pub/R/doc/contrib/intro-spatial-rl.pdf](ftp://cran.r-project.org/pub/R/doc/contrib/intro-spatial-rl.pdf)   
+1. GDAL / Материал из Википедии — свободной энциклопедии. URL: [https://ru.wikipedia.org/wiki/GDAL](https://ru.wikipedia.org/wiki/GDAL)   
+1. GDAL/OGR Info Sheet. URL: [http://www.osgeo.org/gdal_ogr](http://www.osgeo.org/gdal_ogr)   
+1. Ликбез по картографическим проекциям с картинками / Хабрахабр. URL: [https://habrahabr.ru/post/235283/](https://habrahabr.ru/post/235283/)   
+1. Что твои любимые проекции говорят о тебе / Перевод комикса xkcd. URL: [http://joyreactor.cc/post/169188 (оригинал: https://xkcd.com/977/)](http://joyreactor.cc/post/169188); оригинал: [https://xkcd.com/977/](https://xkcd.com/977/)   
+1. Miscellaneous Map Projections / www.csiss.org. URL: [http://www.csiss.org/map-projections/Miscellaneous.html](http://www.csiss.org/map-projections/Miscellaneous.html)   
+1. Roger Bivand and Nicholas Lewin-Koh (2016). maptools:  Tools for Reading and Handling Spatial Objects. R package version 0.8-39. [https://CRAN.R-project.org/package=maptools](https://CRAN.R-project.org/package=maptools)   
+1. Ben Carlson. Plotting polygon shapefiles / github.com. URL: [https://github.com/hadley/ggplot2/wiki/plotting-polygon-shapefiles](https://github.com/hadley/ggplot2/wiki/plotting-polygon-shapefiles)   
+1. Pebesma, E.J., R.S. Bivand, 2005. Classes and methods for spatial data in R. R News 5 (2), [http://cran.r-project.org/doc/Rnews/](http://cran.r-project.org/doc/Rnews/)   
+1. Roger S. Bivand, Edzer Pebesma, Virgilio Gomez-Rubio, 2013. Applied spatial data analysis with R, Second edition. Springer, NY. [http://www.asdar-book.org/](http://www.asdar-book.org/)   
+1. С.Э. Мастицкий, В.К. Шитиков, Статистический анализ и визуализация данных с помощью R. URL: [http://www.ievbras.ru/ecostat/Kiril/R/Mastitsky%20and%20Shitikov%202014.pdf](http://www.ievbras.ru/ecostat/Kiril/R/Mastitsky%20and%20Shitikov%202014.pdf)   
+1. Регионы Республики Беларусь, 2015. Том 1. URL: [http://www.belstat.gov.by/ofitsialnaya-statistika/regiony-respubliki-belarus/publikatsii/index_726/](http://www.belstat.gov.by/ofitsialnaya-statistika/regiony-respubliki-belarus/publikatsii/index_726/)   
+1. Регионы Республики Беларусь, 2015. Том 2. URL: [http://www.belstat.gov.by/ofitsialnaya-statistika/regiony-respubliki-belarus/publikatsii/index_732/](http://www.belstat.gov.by/ofitsialnaya-statistika/regiony-respubliki-belarus/publikatsii/index_732/)   
 1. Dynamic Graphics with the googleVis Package / RPubs. URL: [http://rpubs.com/gallery/googleVis](http://rpubs.com/gallery/googleVis)   
-1. Markus Gesmann and Diego de Castillo. Using the Google Visualisation API with R. The R Journal, 3(2):40-44, December 2011.URL: [http://journal.r-project.org/archive/2011-2/RJournal_2011-2_Gesmann+de~Castillo.pdf](http://journal.r-project.org/archive/2011-2/RJournal_2011-2_Gesmann+de~Castillo.pdf)   
-1. Joe Cheng, Bhaskar Karambelkar and Yihui Xie (2017). leaflet: Create Interactive Web Maps with the JavaScript 'Leaflet' Library. R package version 1.1.0. [https://CRAN.R-project.org/package=leaflet](https://CRAN.R-project.org/package=leaflet)   
-1. Материалы курса «Developing Data Products» Университета Джонса Хопкинса на Coursera. URL: [https://github.com/DataScienceSpecialization/Developing_Data_Products](https://github.com/DataScienceSpecialization/Developing_Data_Products)   
+1. Markus Gesmann and Diego de Castillo. Using the Google Visualisation API with R. The R Journal, 3(2):40-44, December 2011. URL: [http://journal.r-project.org/archive/2011-2/RJournal_2011-2_Gesmann+de~Castillo.pdf](http://journal.r-project.org/archive/2011-2/RJournal_2011-2_Gesmann+de~Castillo.pdf)   
+1. Регионы России. Социально-экономические показатели / gks.ru. URL: [http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1138623506156](http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1138623506156)   

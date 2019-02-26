@@ -4,14 +4,15 @@
 # Установить кодировку в RStudio: Tools -> Global Options -> General, 
 #  Default text encoding: UTF-8
 
-# Аналитический пакет R: Занятие 2
+# Аналитический пакет R: Занятие 3
 
 # Часть 1: Графические системы R -----------------------------------------------
 
 # загрузка пакетов
 library('data.table')          # работаем с объектами "таблица данных"
-library('moments')
-
+library('moments')             # коэффициенты асимметрии и эксцесса 
+library('lattice')
+library('ggplot2')
 
 # Пакет "base" =================================================================
 
@@ -93,9 +94,6 @@ rm(cls, d, mnth.f)
 
 # Пакет "lattice" ==============================================================
 
-# загрузка пакетов
-library('lattice')             # графическая система 'lattice'
-
 
 # Продолжение примера 1 ########################################################
 
@@ -141,7 +139,9 @@ xyplot(qsec ~ mpg,
        xlab = 'Миль на галлон топлива',
        ylab = 'Время, за которое проходит 1/4 мили, секунд',
        panel = function(x, y, fill.color,..., subscripts) {
+           # задать свой цвет каждому наблюдению
            fill = fill.color[subscripts]
+           # изобразить точки разными цветами
            panel.xyplot(x, y, pch = 19, col = fill)
            }
        )                               
@@ -206,9 +206,6 @@ histogram(~ mpg | Число.цилиндров * Коробка.передач,
 
 # Пакет "ggplot2" ==============================================================
 
-# загрузка пакетов
-library('ggplot2')             # графическая система 'ggplot2'
-
 
 # Пример 3 #####################################################################
 
@@ -230,8 +227,8 @@ DT.mpg[, Тип.привода := factor(drv, levels = c('f', 'r', '4'),
                                           'полный'))]
 
 # обозначаем цветом привод
-qplot(displ, 
-      hwy, 
+qplot(x = displ, 
+      y = hwy, 
       data = DT.mpg, 
       color = Тип.привода,
       xlab = 'Объём двигателя, литров',
@@ -239,8 +236,8 @@ qplot(displ,
 
 # РАЗБРОС СО СГЛАЖИВАНИЕМ
 # простая функция qplot()
-qplot(displ, 
-      hwy, 
+qplot(x = displ, 
+      y = hwy, 
       data = DT.mpg,
       xlab = 'Объём двигателя, литров',
       ylab = 'Миль на галлон', 
@@ -296,12 +293,13 @@ if (!file.exists('./data/040510-Imp-RF-comtrade.csv')) {
 }
 # читаем данные из загруженного .csv во фрейм, если он ещё не существует
 if (!exists('DT')){
-    DT <- data.table(read.csv('./data/040510-Imp-RF-comtrade.csv', as.is = T))
+    DT.import <- data.table(read.csv('./data/040510-Imp-RF-comtrade.csv', 
+                                     stringsAsFactors = F))
 }
 # предварительный просмотр
-dim(DT)     # размерность таблицы
-str(DT)     # структура (характеристики столбцов)
-DT          # удобный просмотр объекта data.table
+dim(DT.import)            # размерность таблицы
+str(DT.import)            # структура (характеристики столбцов)
+DT.import          # удобный просмотр объекта data.table
 
 
 # Заполнение пропусков средними значениями =====================================
@@ -310,13 +308,13 @@ DT          # удобный просмотр объекта data.table
 # Пример 4.1 ###################################################################
 
 # сколько NA в каждом из оставшихся столбцов?
-na.num <- apply(DT, 2, function(x) sum(is.na(x)))
+na.num <- apply(DT.import, 2, function(x) sum(is.na(x)))
 # выводим только положительные и по убыванию
 sort(na.num[na.num > 0], decreasing = T)
 
 # графики плотности распределения массы поставки по годам
 png('Pic-01.png', width = 500, height = 500)
-densityplot(~ Netweight.kg | as.factor(Year), data = DT,
+densityplot( ~ Netweight.kg | as.factor(Year), data = DT.import,
             ylim = c(-0.5e-05, 8.5e-05),
             main = 'Распределение массы поставки по годам, Netweight.kg',
             xlab = 'Масса поставки, кг',
@@ -325,25 +323,25 @@ dev.off()
 
 # явное преобразование типа, чтобы избежать проблем 
 #  при заполнении пропусков
-DT[, Netweight.kg := as.double(Netweight.kg)]
+DT.import[, Netweight.kg := as.double(Netweight.kg)]
 # считаем медианы и округляем до целого, как исходные данные
-DT[, round(median(.SD$Netweight.kg, na.rm = T), 0), 
-   by = Year]
+DT.import[, round(median(.SD$Netweight.kg, na.rm = T), 0), 
+          by = Year]
 
 # сначала копируем все значения
-DT[, Netweight.kg.median := round(median(.SD$Netweight.kg,
-                                         na.rm = T), 0), by = Year]
+DT.import[, Netweight.kg.median := round(median(.SD$Netweight.kg,
+                                                na.rm = T), 0), by = Year]
 # затем заменяем пропуски на медианы
-DT[!is.na(Netweight.kg), Netweight.kg.median := Netweight.kg]
+DT.import[!is.na(Netweight.kg), Netweight.kg.median := Netweight.kg]
 
 # смотрим результат
-DT[, Netweight.kg, Netweight.kg.median]
-DT[is.na(Netweight.kg), Year, Netweight.kg.median]
+DT.import[, Netweight.kg, Netweight.kg.median]
+DT.import[is.na(Netweight.kg), Year, Netweight.kg.median]
 
 # смотрим, что изменилось
 png('Pic-02.png', width = 500, height = 500)
 densityplot(~ Netweight.kg.median | as.factor(Year),
-            data = DT,
+            data = DT.import,
             ylim = c(-0.5e-05, 8.5e-05),
             main = 'Распределение массы поставки по годам, Netweight.kg.median',
             xlab = 'Масса поставки, кг',
@@ -352,21 +350,21 @@ dev.off()
 
 # если то же самое сделать по среднему арифметическому
 # считаем средние и округляем до целого, как исходные данные
-DT[, round(mean(.SD$Netweight.kg, na.rm = T), 0), by = Year]
+DT.import[, round(mean(.SD$Netweight.kg, na.rm = T), 0), by = Year]
 
 # заменяем пропуски на средние
-DT[, Netweight.kg.mean := round(mean(.SD$Netweight.kg, 
-                                       na.rm = T), 0), by = Year]
-DT[!is.na(Netweight.kg), Netweight.kg.mean := Netweight.kg]
+DT.import[, Netweight.kg.mean := round(mean(.SD$Netweight.kg, 
+                                            na.rm = T), 0), by = Year]
+DT.import[!is.na(Netweight.kg), Netweight.kg.mean := Netweight.kg]
 
 # смотрим результат
-DT[, Netweight.kg, Netweight.kg.mean]
-DT[is.na(Netweight.kg), Year, Netweight.kg.mean]
+DT.import[, Netweight.kg, Netweight.kg.mean]
+DT.import[is.na(Netweight.kg), Year, Netweight.kg.mean]
 
 # смотрим, что изменилось
 png('Pic-03.png', width = 500, height = 500)
 densityplot(~ Netweight.kg.mean | as.factor(Year), 
-            data = DT,
+            data = DT.import,
             ylim = c(-0.5e-05, 8.5e-05),
             main = 'Распределение массы поставки по годам, Netweight.kg.mean',
             xlab = 'Масса поставки, кг',
@@ -393,8 +391,9 @@ df.stats
 # Пример 4.2 ###################################################################
 
 # переменные: масса поставки и её стоимость
-x <- DT$Trade.Value.USD
-y <- DT$Netweight.kg
+x <- DT.import$Trade.Value.USD
+y <- DT.import$Netweight.kg
+y[y == 0] <- NA
 
 # оценка регрессии с помощью МНК
 fit <- lm(y ~ x)
@@ -474,7 +473,7 @@ points(x = log(NAs),
        col = 'red', pch = '|')
 
 # новый столбец, в котором будут заполнены пропуски
-DT[, Netweight.kg.model := Netweight.kg]
+DT.import[, Netweight.kg.model := Netweight.kg]
 # прогноз по модели на логарифмах сохраняем как вектор
 y.model.log <- predict(fit.log, newdata = data.frame(x = NAs))
 # наносим прогнозы на график
@@ -484,15 +483,15 @@ points(log(NAs),
 # пересчитываем в исходные единицы измерения y
 y.model <- exp(y.model.log)
 # заполняем пропуски модельными значениями
-DT[is.na(Netweight.kg.model), Netweight.kg.model := round(y.model, 0)]
+DT.import[is.na(Netweight.kg.model), Netweight.kg.model := round(y.model, 0)]
 # смотрим результат
-DT[, Netweight.kg, Netweight.kg.model]
-DT[is.na(Netweight.kg), Netweight.kg.model , Trade.Value.USD]
+DT.import[, Netweight.kg, Netweight.kg.model]
+DT.import[is.na(Netweight.kg), Netweight.kg.model , Trade.Value.USD]
 
 # смотрим, как теперь выглядит распределение Netweight.kg
 png('Pic-04.png', width = 500, height = 500)
 densityplot(~ Netweight.kg.model | as.factor(Year), 
-            data = DT,
+            data = DT.import,
             ylim = c(-0.5e-05, 8.5e-05),
             main = 'Распределение массы поставки по годам, Netweight.kg.model',
             xlab = 'Масса поставки, кг',
@@ -500,7 +499,8 @@ densityplot(~ Netweight.kg.model | as.factor(Year),
 dev.off()
 
 # скошенность и эксцесс для переменной в целом
-df.stats[nrow(df.stats) + 1, ] <- c('Netweight.kg.model',
-                                    round(skewness(DT$Netweight.kg.model), 2),
-                                    round(kurtosis(DT$Netweight.kg.model), 2))
+df.stats[nrow(df.stats) + 1, ] <- 
+    c('Netweight.kg.model',
+      round(skewness(DT.import$Netweight.kg.model), 2),
+      round(kurtosis(DT.import$Netweight.kg.model), 2))
 df.stats

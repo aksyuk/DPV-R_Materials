@@ -4,14 +4,15 @@
 # Установить кодировку в RStudio: Tools -> Global Options -> General, 
 #  Default text encoding: UTF-8
 
-# Аналитический пакет R: Занятие 2
+# Аналитический пакет R: Занятие 3
 
 # Часть 1: Графические системы R -----------------------------------------------
 
 # загрузка пакетов
 library('data.table')          # работаем с объектами "таблица данных"
-library('moments')             # функции skewness() и kurtosis()
-
+library('moments')             # коэффициенты асимметрии и эксцесса 
+library('lattice')
+library('ggplot2')
 
 # Пакет "base" =================================================================
 
@@ -21,13 +22,13 @@ library('moments')             # функции skewness() и kurtosis()
 # справка
 ?airquality
 # копируем в таблицу данных
-DT <- 
+DT.air <- 
 
 # простой график разброса
 
 
 # сколько месяцев в данных?
-
+unique(DT.air$Month)
 
 # цвет по месяцам для легенды графика
 mnth.f <- 
@@ -40,31 +41,31 @@ cls
 # создаём график без осей
 plot(x = , 
      y = , 
-     pch = , 
-     bg = ,
-     axes = , 
-     ylim = , 
-     xlim = , 
+     pch = 21, 
+     bg = cls[as.factor(DT.air$Month)],
+     axes = F, 
+     ylim = c(0, 25), 
+     xlim = c(0, 180), 
      xlab = 'Озон в воздухе, частиц на миллиард', 
      ylab = 'Сила ветра, м/час')
 
 # горизонтальная ось 
-axis(side = , 
-     pos = , 
-     at = ,
-     labels = )
+axis(side = 1, 
+     pos = 0, 
+     at = seq(0, 150, by = 50),
+     labels = seq(0, 150, by = 50))
 # вертикальная ось
-axis(side = , 
-     pos = , 
-     at = ,
-     labels = ,
-     las = )
+axis(side = 2, 
+     pos = 0, 
+     at = seq(0, 20, by = 5),
+     labels = c('', seq(5, 20, by = 5)),
+     las = 2)
 # стрелки на концах осей
-
-
+arrows(x0 = c(0, 150), y0 = c(20, 0),
+       x1 = c(0, 180), y1 = c(25, 0))
 
 # легенда
-
+legend('topright', legend = mnth.f, fill = cls[mnth.f])
 # заголовок
 mtext(text = 'Разброс значений по месяцам', 
       side = 3, line = 2, font = 2)
@@ -73,19 +74,19 @@ mtext(text = '(в легенде указан номер месяца)',
 
 # КОРОБЧАТАЯ ДИАГРАММА
 # ящики с усами по месяцам
-boxplot( , 
+boxplot( 
         xlab = 'Номер месяца', 
         ylab = 'Озон в воздухе, частиц на миллиард')
 
 # ГРАФИК ПЛОТНОСТИ РАСПРЕДЕЛЕНИЯ
-d <-
-# граница
-plot( , 
+d <- 
+plot( 
      main = 'Плотность распределения показателя \n "Содержание озона в воздухе"',
      ylab = 'Плотность')
 # заливка
-
-
+polygon( 
+        col = rgb(1, 0, 0, alpha = 0.4), 
+        border = 'red')
 
 # удаляем временные объекты
 rm(cls, d, mnth.f)
@@ -93,14 +94,11 @@ rm(cls, d, mnth.f)
 
 # Пакет "lattice" ==============================================================
 
-# загрузка пакетов
-library('lattice')             # графическая система 'lattice'
-
 
 # Продолжение примера 1 ########################################################
 
 # ГРАФИКИ ПЛОТНОСТИ РАСПРЕДЕЛЕНИЯ ПО МЕСЯЦАМ
-densityplot( ,
+densityplot(
              main = 'Распределение содержания озона в воздухе по месяцам',
              xlab = 'Озон в воздухе, частиц на миллиард',
              ylab = 'Плотность распределения')
@@ -112,14 +110,14 @@ densityplot( ,
 # справка
 ?mtcars
 # сохраняем данные в таблицу
-DT.cars <- data.table(mtcars)
+DT.cars <- 
 
 # ГРАФИК РАЗБРОСА
-                  
+                   
 
 # ПОКАЖЕМ ТРЕТЬЮ ПЕРЕМЕННУЮ ЦВЕТОМ (НЕПРЕРЫВНАЯ)
 # палитра с градиентом
-rbPal <- 
+rbPal <- colorRampPalette(c('cyan', 'navyblue'))
 # переводим непрерывную переменную hp в 10 интервалов
 hp.cut <- 
 # уникальные и отсортированные интервалы для легенды
@@ -128,49 +126,51 @@ hp.intervals <-
 cls <- 
 
 # строим график и задаём легенду вручную
-xyplot( , 
+xyplot( 
        data = , 
        key = list(text = list(lab = as.character(hp.intervals)),
                   points = list(pch = 21, 
                                 col = rbPal(10)[hp.intervals],
                                 fill = rbPal(10)[hp.intervals]),
-                  columns = , 
+                  columns = 3, 
                   title = 'Интервалы мощности, л.с.', 
                   cex.title = 1),
        fill.color = ,
        xlab = 'Миль на галлон топлива',
        ylab = 'Время, за которое проходит 1/4 мили, секунд',
-       panel = function(x, y, fill.color, ..., subscripts) {
-           fill = fill.color[subscripts]
-           panel.xyplot(x, y, pch = 19, col = fill)
+       panel = function(x, y, fill.color,..., subscripts) {
+           # задать свой цвет каждому наблюдению
+           
+           # изобразить точки разными цветами
+           
            }
        )                               
 
 # ПОКАЖЕМ ТРЕТЬЮ ПЕРЕМЕННУЮ ЦВЕТОМ (ФАКТОР)
 # новая переменная-фактор: количество цилиндров
 DT.cars[, Число.цилиндров := factor(cyl, levels = c(4, 6, 8), 
-                                    labels = c('4 цилиндра', 
-                                               '6 цилиндров',
-                                               '8 цилиндров'))]
+                                  labels = c('4 цилиндра', 
+                                             '6 цилиндров',
+                                             '8 цилиндров'))]
 
 # группы обозначены цветом: дискретный показатель. 
-xyplot( , 
-       data = ,
-       groups = ,
+xyplot(
+       data = DT.cars, 
+       groups = Число.цилиндров,
        auto.key = T, 
        ylab = 'Время, за которое проходит 1/4 мили, секунд',
        xlab = 'Миль на галлон топлива')
 
 # РАЗБРОС С РАЗБИВКОЙ ПО ГРУППАМ
 # группы вынесены на отдельные панели графика
-xyplot( , 
-       data = ,
+xyplot(
+       data = DT.cars,
        ylab = 'Время, за которое проходит 1/4 мили, секунд',
        xlab = 'Миль на галлон топлива')
 
 # то же самое со средними по вертикальной оси (медианы)
-xyplot( ,
-       data = , 
+xyplot(
+       data = DT.cars, 
        xlab = 'Миль на галлон топлива',
        ylab = 'Время, за которое проходит 1/4 мили, секунд',
        panel = function(x, y, ...) {
@@ -186,8 +186,8 @@ DT.cars[, Коробка.передач := factor(am, levels = c(0, 1),
                                                'ручная'))]
 
 # графики разброса с линиями регрессий
-xyplot( ,
-       data = , 
+xyplot( 
+       data = DT.cars, 
        ylab = 'Время, за которое проходит 1/4 мили, секунд',
        xlab = 'Миль на галлон топлива',
        main = 'Характеристики в зависимости от типа коробки передач',
@@ -196,18 +196,15 @@ xyplot( ,
            
            # затем накладываем линии регрессии
            
-           })
+       })
 
 # ГИСТОГРАММЫ
 # гистограммы с разбиением по двум категориальным переменным
-histogram( , 
-          data = )
+histogram( 
+          data = DT.cars)
 
 
 # Пакет "ggplot2" ==============================================================
-
-# загрузка пакетов
-library('ggplot2')             # графическая система 'ggplot2'
 
 
 # Пример 3 #####################################################################
@@ -217,7 +214,7 @@ library('ggplot2')             # графическая система 'ggplot2'
 # справка
 ?mpg
 # сохраняем данные в таблицу
-DT.mpg <- data.table(mpg)
+DT.mpg <- 
 
 # РАЗБРОС
 # простой график разброса
@@ -230,31 +227,31 @@ DT.mpg[, Тип.привода := factor(drv, levels = c('f', 'r', '4'),
                                           'полный'))]
 
 # обозначаем цветом привод
-qplot(x = , 
+qplot(x =  ,
       y = , 
       data = , 
-      color = ,
+      color = Тип.привода,
       xlab = 'Объём двигателя, литров',
       ylab = 'Миль на галлон')
 
 # РАЗБРОС СО СГЛАЖИВАНИЕМ
 # простая функция qplot()
-qplot(x = , 
-      y = , 
-      data = ,
-      geom = ,
+qplot(x = displ, 
+      y = hwy, 
+      data = DT.mpg,
       xlab = 'Объём двигателя, литров',
-      ylab = 'Миль на галлон')
+      ylab = 'Миль на галлон',  
+      )
 
 # использование явной грамматики, функция ggplot()
 # начинаем строить ggplot с объявления исходных данных
 gp <- 
 # объясняем, как изображать данные: график разброса
-gp <- 
+gp <- gp + 
 # добавляем фасетки для разных типов привода
-gp <- 
+gp <- gp + 
 # добавляем линии регрессии
-gp <- 
+gp <- gp + 
 # добавляем подписи осей и заголовок
 gp <- gp + xlab('Объём двигателя, литров') 
 gp <- gp + ylab('Миль на галлон')
@@ -264,11 +261,11 @@ gp
 
 # КОРОБКИ ПО ГРУППАМ (ЦВЕТ + ОСЬ)
 # всё, что зависит от значений данных, заносим в аргумент aes
-gp <- ggplot(data = , 
-             aes(x = ,
-                 y = ,
-                 color = ))
-gp <- 
+gp <- ggplot(data = DT.mpg, 
+             aes(x = as.factor(year), 
+                 y = displ, 
+                 ))
+gp <- gp + 
 gp <- gp + xlab('Объём двигателя, литров')
 gp <- gp + ylab('Миль на галлон')
 gp
@@ -296,12 +293,13 @@ if (!file.exists('./data/040510-Imp-RF-comtrade.csv')) {
 }
 # читаем данные из загруженного .csv во фрейм, если он ещё не существует
 if (!exists('DT')){
-    DT <- data.table(read.csv('./data/040510-Imp-RF-comtrade.csv', as.is = T))
+    DT.import <- data.table(read.csv('./data/040510-Imp-RF-comtrade.csv', 
+                                     stringsAsFactors = F))
 }
 # предварительный просмотр
-dim(DT)     # размерность таблицы
-str(DT)     # структура (характеристики столбцов)
-DT          # удобный просмотр объекта data.table
+dim(DT.import)            # размерность таблицы
+str(DT.import)            # структура (характеристики столбцов)
+DT.import          # удобный просмотр объекта data.table
 
 
 # Заполнение пропусков средними значениями =====================================
@@ -316,8 +314,7 @@ na.num <-
 
 # графики плотности распределения массы поставки по годам
 png('Pic-01.png', width = 500, height = 500)
-densityplot( , 
-            data = ,
+densityplot(, data = ,
             ylim = c(-0.5e-05, 8.5e-05),
             main = 'Распределение массы поставки по годам, Netweight.kg',
             xlab = 'Масса поставки, кг',
@@ -326,24 +323,25 @@ dev.off()
 
 # явное преобразование типа, чтобы избежать проблем 
 #  при заполнении пропусков
-
+DT.import[, Netweight.kg := ]
 # считаем медианы и округляем до целого, как исходные данные
 
 
 
 # сначала копируем все значения
 
+
 # затем заменяем пропуски на медианы
 
 
 # смотрим результат
+DT.import[, Netweight.kg, Netweight.kg.median]
+DT.import[is.na(Netweight.kg), Year, Netweight.kg.median]
 
-
-
-# смотрим, что изменилось на графике
+# смотрим, что изменилось
 png('Pic-02.png', width = 500, height = 500)
-densityplot( ,
-            data = ,
+densityplot( ~ Netweight.kg.median | as.factor(Year),
+            data = DT.import,
             ylim = c(-0.5e-05, 8.5e-05),
             main = 'Распределение массы поставки по годам, Netweight.kg.median',
             xlab = 'Масса поставки, кг',
@@ -352,21 +350,21 @@ dev.off()
 
 # если то же самое сделать по среднему арифметическому
 # считаем средние и округляем до целого, как исходные данные
-
+DT.import[, round(mean(.SD$Netweight.kg, na.rm = T), 0), by = Year]
 
 # заменяем пропуски на средние
-
-
-
+DT.import[, Netweight.kg.mean := round(mean(.SD$Netweight.kg,
+                                            na.rm = T), 0), by = Year]
+DT.import[!is.na(Netweight.kg), Netweight.kg.mean := Netweight.kg]
 
 # смотрим результат
-
-
+DT.import[, Netweight.kg, Netweight.kg.mean]
+DT.import[is.na(Netweight.kg), Year, Netweight.kg.mean]
 
 # смотрим, что изменилось
 png('Pic-03.png', width = 500, height = 500)
-densityplot(,
-            data = ,
+densityplot( ~ Netweight.kg.mean | as.factor(Year), 
+            data = DT.import,
             ylim = c(-0.5e-05, 8.5e-05),
             main = 'Распределение массы поставки по годам, Netweight.kg.mean',
             xlab = 'Масса поставки, кг',
@@ -375,15 +373,16 @@ dev.off()
 
 # скошенность и эксцесс для переменных в целом
 # ненормальность распределений закономерно усиливается
-df.stats <- data.frame(var = c('Netweight.kg', 'Netweight.kg.median', 
-                               'Netweight.kg.mean'),
-                       skew = round(c(skewness(na.omit(DT$Netweight.kg)), 
-                                      skewness(DT$Netweight.kg.median),
-                                      skewness(DT$Netweight.kg.mean)), 2),
-                       kurt = round(c(kurtosis(na.omit(DT$Netweight.kg)), 
-                                      kurtosis(DT$Netweight.kg.median),
-                                      kurtosis(DT$Netweight.kg.mean)), 2),
-                       stringsAsFactors = F)
+df.stats <- 
+    data.frame(var = c('Netweight.kg', 'Netweight.kg.median', 
+                       'Netweight.kg.mean'),
+               skew = round(c(skewness(na.omit(DT.import$Netweight.kg)), 
+                              skewness(DT.import$Netweight.kg.median),
+                              skewness(DT.import$Netweight.kg.mean)), 2),
+               kurt = round(c(kurtosis(na.omit(DT.import$Netweight.kg)), 
+                              kurtosis(DT.import$Netweight.kg.median),
+                              kurtosis(DT.import$Netweight.kg.mean)), 2),
+               stringsAsFactors = F)
 df.stats
 
 
@@ -395,72 +394,73 @@ df.stats
 # переменные: масса поставки и её стоимость
 x <- 
 y <- 
+y[y == 0] <- NA
 
 # оценка регрессии с помощью МНК
 fit <- 
 # результаты
 summary(fit)
 # сохраняем R-квадрат
-R.sq <- 
+R.sq <- summary(fit)$r.squared     
 
 # график разброса с линией регрессии
 # 1. делаем точки прозрачными, чтобы обозначить центр массы
-plot(x = , 
-     y = , 
+plot(, 
+     , 
      xlab = 'Стоимость поставки, долл.США', 
      ylab = 'Масса поставки, кг',
      pch = 21, 
      col = rgb(0, 0, 0, alpha = 0.4), 
      bg = rgb(0, 0, 0, alpha = 0.4))
 # 2. добавляем прямую регрессии на график
-
+abline(fit, col = rgb(0, 0, 1), lwd = 2)
 # 3. добавляем название графика
 mtext(paste('Прямая линейная взаимосвязь, R^2=', 
             round(R.sq*100, 1),
             '%', sep = ''), 
       side = 3, line = 1)
 # координаты пропущенных y по оси x
-NAs <- 
+NAs <- x[is.na(y)]
 # 4. отмечаем каким значениям x соответствуют пропущенные y
-points(x = , 
-       y = , 
+points(x = NAs,
+       y = rep(0, length(NAs)), 
        col = 'red', pch = '|')
 
 # увеличение участка графика: добавляем xlim, ylim
-plot(x = , 
-     y = , 
-     xlim = , 
-     ylim = ,
+plot(x, 
+     y, 
+     xlim = c(0, 5000), 
+     ylim = c(0, 5000),
      xlab = 'Стоимость поставки, долл.США', 
      ylab = 'Масса поставки, кг',
      pch = 21, 
      col = rgb(0, 0, 0, alpha = 0.4), 
      bg = rgb(0, 0, 0, alpha = 0.4))
 # линия регрессии
-
+abline(fit, col = rgb(0, 0, 1), lwd = 2)
 # координаты пропусков по X
-
-
-
+points(x = NAs, 
+       y = rep(0, length(NAs)), 
+       col = 'red', pch = '|')
 
 # пробуем регрессию на логарифмах
 fit.log <- 
 # результаты
-    
+summary(fit.log)
 # сохраняем R-квадрат
-R.sq.log <- 
+R.sq.log <- summary(fit.log)$r.squared  
 
 # график разброса с линией регрессии (логарифмы)
 # 1. делаем точки прозрачными, чтобы обозначить центр массы
-plot(x = ,
-     y = , 
+plot(, 
+     , 
      xlab = 'Логарифмы стоимости поставки', 
      ylab = 'Логарифмы массы поставки',
      pch = 21, 
      col = rgb(0, 0, 0, alpha = 0.4), 
      bg = rgb(0, 0, 0, alpha = 0.4))
 # 2. добавляем прямую регрессии на график
-
+abline(fit.log, col = rgb(0, 0, 1), lwd = 2)
 
 # 3. добавляем название графика
 mtext(paste('Прямая линейная взаимосвязь, R^2=',
@@ -469,30 +469,30 @@ mtext(paste('Прямая линейная взаимосвязь, R^2=',
       side = 3, line = 1)
 
 # отмечаем каким значениям x соответствуют пропущенные y
-points(x = , 
-       y = , 
+points(x = log(NAs), 
+       y = rep(0, length(NAs)), 
        col = 'red', pch = '|')
 
 # новый столбец, в котором будут заполнены пропуски
-
+DT.import[, Netweight.kg.model := Netweight.kg]
 # прогноз по модели на логарифмах сохраняем как вектор
-y.model.log <- 
+y.model.log <- predict(fit.log, newdata = data.frame(x = NAs))
 # наносим прогнозы на график
-points(, 
-       , 
+points(log(NAs), 
+       y.model.log, 
        pch = '+', cex = 2)
 # пересчитываем в исходные единицы измерения y
 y.model <- 
 # заполняем пропуски модельными значениями
-
+DT.import[is.na(Netweight.kg.model), Netweight.kg.model := ]
 # смотрим результат
-
-
+DT.import[, Netweight.kg, Netweight.kg.model]
+DT.import[is.na(Netweight.kg), Netweight.kg.model , Trade.Value.USD]
 
 # смотрим, как теперь выглядит распределение Netweight.kg
 png('Pic-04.png', width = 500, height = 500)
-densityplot( , 
-            data = ,
+densityplot( ~ Netweight.kg.model | as.factor(Year), 
+            data = DT.import,
             ylim = c(-0.5e-05, 8.5e-05),
             main = 'Распределение массы поставки по годам, Netweight.kg.model',
             xlab = 'Масса поставки, кг',
@@ -500,7 +500,8 @@ densityplot( ,
 dev.off()
 
 # скошенность и эксцесс для переменной в целом
-df.stats[nrow(df.stats) + 1, ] <- c('Netweight.kg.model',
-                                    round(skewness(DT$Netweight.kg.model), 2),
-                                    round(kurtosis(DT$Netweight.kg.model), 2))
+df.stats[nrow(df.stats) + 1, ] <- 
+    c('Netweight.kg.model',
+      round(skewness(DT.import$Netweight.kg.model), 2),
+      round(kurtosis(DT.import$Netweight.kg.model), 2))
 df.stats
