@@ -29,14 +29,16 @@
 autosize: true
 font-family: 'Verdana'
 
-## Практика 2:  
-## <center>Графические системы в R</center>
+## Практика №2: Графические системы R      
+
+Светлана Андреевна Суязова (Аксюк)  
+<a href = "mailto:s.aksuk@kiber-guu.ru">s.aksuk@kiber-guu.ru</a>  
 
 ```{r Подготовка рабочего пространства, include = F}
 library('knitr')
 
 # для колонтитулов: слева -- название лекции...
-str.footer.left <- 'ДПВ "Аналитический пакет R": Графические системы в R'
+str.footer.left <- 'ДПВ "Аналитический пакет R": Графические системы R'
 # ...справа -- номер страницы (счётчик на каждом слайде)
 slide.number <- 1
 
@@ -44,7 +46,7 @@ slide.number <- 1
 
 <!-- Нижний колонтитул -->
 <div class = "footer-left" style = "font-size: 70%; color: white; width:50%;">ГУУ, ИИС, кафедра ММЭУ</div>
-<div class = "footer-right" style = "font-size: 70%; color: white; width:50%;">весенний семестр 2017/2018</div>
+<div class = "footer-right" style = "font-size: 70%; color: white; width:50%;">весенний семестр 2018/2019</div>
 
 План практики 
 ========================================================
