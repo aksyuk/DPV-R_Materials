@@ -16,7 +16,7 @@ shinyUI(
             # слайдер: фильтр по годам
             sliderInput('year.range', 'Годы:',
                         min = 2010, max = 2017, value = c(2010, 2017),
-                        format = '####', width = "100%", sep = ''),
+                        width = "100%", sep = ''),
             # выпадающее меню: страна для отбора наблюдений
             uiOutput('stateList')
         ),
@@ -30,7 +30,7 @@ shinyUI(
             # таблица данных
             dataTableOutput('table'),
             # кнопка сохранения данных
-            actionButton('save.csv', 'Сохранить данные в .csv'),
+            actionButton('save.csv', 'Сохранить данные в .csv')
         )
     )
 )

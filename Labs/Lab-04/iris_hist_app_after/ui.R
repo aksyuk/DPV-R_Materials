@@ -29,9 +29,9 @@ shinyUI(
         # главная область
         mainPanel(
             # текстовый объект для отображения
-            
+            textOutput('sp.text'),
             # гистограммы переменных
-            
+            plotOutput('sp.hist')
             )
         )
-    )
+    )     

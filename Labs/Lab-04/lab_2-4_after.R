@@ -31,17 +31,17 @@ library('zoo')                 # работа с датами, as.yearmon()
 unique(iris$Species)
 
 # список уникальных значений столбца Species для фильтрации данных
-sp.filter <- 
-names(sp.filter) <- 
-sp.filter <- 
+sp.filter <- as.character(unique(iris$Species))
+names(sp.filter) <- sp.filter
+sp.filter <- as.list(sp.filter)
 sp.filter
 
 # количество интервалов для гистограммы
-hist.int <- 
+hist.int <- 3
 
 # гистограммы характеристик ириса
 # сначала фильтруем данные
-DF <- 
+DF <- iris[iris$Species == sp.filter[1], 1:4]
 # затем строим гистограммы переменных
 histogram( ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width, 
            data = DF,
@@ -49,22 +49,18 @@ histogram( ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width,
            breaks = seq(min(DF), max(DF), 
                         length = hist.int + 1))
 
-# создать папку для файлов приложения
-if (!file.exists('./iris_hist_app')) {
-    dir.create('./iris_hist_app')}
+# загрузить архив с приложением
+file.URL <- 'https://sites.google.com/a/kiber-guu.ru/r-practice/dpv/iris_hist_app.zip?attredirects=0&d=1'
+download.file(file.URL, destfile = 'iris_hist_app.zip',
+              mode = 'wb', cacheOK = FALSE)
+# распаковать
+unzip('iris_hist_app.zip', overwrite = T)
 
-# создать файлы приложения
-# ui.R
-if (!file.exists('./iris_hist_app/ui.R')) {
-    file.create('./iris_hist_app/ui.R')}
-# server.R
-if (!file.exists('./iris_hist_app/server.R')) {
-    file.create('./iris_hist_app/server.R')}
-
-# ДАЛЬШЕ ИЗМЕНЯЕМ ФАЙЛЫ ПРИЛОЖЕНИЯ: ui.R и server.R
+# ДАЛЬШЕ ИЗМЕНЯЕМ ФАЙЛЫ ПРИЛОЖЕНИЯ: ui.R и server.R ............................
+#  в папке iris_hist_app                            ............................
 
 # запустить приложение
-runApp('./iris_hist_app', launch.browser = T,
+runApp('./iris_hist_app', launch.browser = T, 
        display.mode = 'showcase')
 
 
@@ -86,17 +82,23 @@ DT <- data.table(airquality)
 DT[, .N, by = Month]
 
 # создаём и фильтруем таблицу данных
-DT <- 
-DT <- 
-    
+DT <- data.table(airquality)
+DT <- select(DT[between(Month, 5, 7), ], Solar.R, Wind, Month)
+
 # строим график
-gp <- 
-    
-gp <- 
+gp <- ggplot(data = DT, aes_string(x = 'Solar.R', y = 'Wind'))
+gp <- gp + geom_point() + geom_smooth(method = 'lm')
 gp
 
-# СКАЧИВАЕМ, РАСПАКОВЫВАЕМ в папку ./air_plot_app 
-#  И ИЗМЕНЯЕМ ФАЙЛЫ ПРИЛОЖЕНИЯ: ui.R и server.R
+# загрузить архив с приложением
+file.URL <- 'https://sites.google.com/a/kiber-guu.ru/r-practice/dpv/air_plot_app.zip?attredirects=0&d=1'
+download.file(file.URL, destfile = 'air_plot_app.zip',
+              mode = 'wb', cacheOK = FALSE)
+# распаковать
+unzip('air_plot_app.zip', overwrite = T)
+
+# ДАЛЬШЕ ИЗМЕНЯЕМ ФАЙЛЫ ПРИЛОЖЕНИЯ: ui.R и server.R ............................
+#  в папке air_plot_app                             ............................
 
 # запустить приложение
 runApp('./air_plot_app', launch.browser = T,
@@ -123,20 +125,20 @@ if (!exists('DT.import')){
 }
 
 # выбираем столбцы функцией select
-
+select(DT.import, Period, Reporter, Trade.Value.USD)
 
 # добавляем условие на отбор строк функцией filter
-
-
+filter(select(DT.import, Period, Reporter, Trade.Value.USD), 
+       Reporter == 'EU-27')
 
 # рассчитать суммарную массу поставок по каждой стране
-
-
-
+select(DT.import, Reporter, Trade.Value.USD) %>% 
+    group_by(Reporter) %>% 
+    mutate(Trade.Value.USD.by.country = sum(Trade.Value.USD))
 
 # переводим период в дату: начало соответствующего месяца
 DT.import[, Period.Date := as.POSIXct(as.yearmon(as.character(Period), 
-                                                 '%Y%m'))]
+                                                              '%Y%m'))]
 # что получилось
 DT.import[, c('Period', 'Period.Date'), with = F]
 
@@ -156,10 +158,15 @@ head(DT.import, n = 3)
 #  Дать возможность сохранить результат – отфильтрованные и агрегированные 
 #  данные – можно сохранить в файл с расширением «.csv».
 
-# СКАЧИВАЕМ, РАСПАКОВЫВАЕМ в папку ./import_app 
-#  И ИЗМЕНЯЕМ ФАЙЛЫ ПРИЛОЖЕНИЯ: ui.R и server.R
+# загрузить архив с приложением
+file.URL <- 'https://sites.google.com/a/kiber-guu.ru/r-practice/dpv/import_app.zip?attredirects=0&d=1'
+download.file(file.URL, destfile = 'import_app.zip',
+              mode = 'wb', cacheOK = FALSE)
+# распаковать
+unzip('import_app.zip', overwrite = T)
 
-
+# ДАЛЬШЕ ИЗМЕНЯЕМ ФАЙЛЫ ПРИЛОЖЕНИЯ: ui.R и server.R ............................
+#  в папке import_app                               ............................
 
 # запустить приложение
 runApp('./import_app', launch.browser = T,

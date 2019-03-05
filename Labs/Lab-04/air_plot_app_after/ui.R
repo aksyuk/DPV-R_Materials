@@ -1,6 +1,5 @@
 # ФАЙЛ ./air_plot_app/ui.R -----------------------------------------------------
-# загрузка пакетов
-library('shiny')
+library('shiny')        # загрузка пакетов
 
 shinyUI(
     pageWithSidebar(

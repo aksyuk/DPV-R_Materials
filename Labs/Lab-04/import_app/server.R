@@ -41,33 +41,33 @@ shinyServer(function(input, output) {
                                         input$year.range[2]))
         # агрегируем
         if (input$period.name == 'Месяц') {
-            DT <- filter(DT, Reporter == input$state) %>% 
-                mutate(period = as.yearmon(Period.Date))
+            DT <- 
+                
         } else {
-            DT <- filter(DT, Reporter == input$state) %>%
-                mutate(period = as.yearqtr(Period.Date))
+            DT <- 
+                
         }
-        DT <- DT %>% group_by(period) %>% 
-            mutate(Trade.Value.USD = sum(Trade.Value.USD))
+        DT <- 
+            
         DT <- data.table(DT)
         # добавляем ключевой столбец: период времени
         setkey(DT, 'period')
         # оставляем только уникальные периоды времени
         DT <- data.table(unique(DT))
     })
-
+    
     # текст: выбрана страна
     output$text <- renderText({input$state}) 
-    
+        
     # график динамики
     output$ts.plot <- renderPlot({
-        gp <- ggplot(DT(), aes(x = period, y = Trade.Value.USD))
+        gp <- 
         if (input$period.name == 'Месяц') {
             gp + geom_histogram(stat = 'identity') + 
-                scale_x_yearmon(format = "%b %Y")            
+                scale_x_yearmon(format = "%b %Y")
         } else {
             gp + geom_histogram(stat = 'identity') + 
-                scale_x_yearqtr(format = "%YQ%q")            
+                scale_x_yearqtr(format = "%YQ%q")
         }
     })
     
