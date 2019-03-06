@@ -24,12 +24,13 @@
   
 </style>
 
+
 ДПВ "Аналитический пакет R"
 ========================================================
 autosize: true
 font-family: 'Verdana'
 
-## Практика 3:  
+## Практика 4:  
 ## <center>Приложения в пакете 'shiny'</center>
 
 ```{r Подготовка рабочего пространства, include = F}
@@ -44,7 +45,8 @@ slide.number <- 1
 
 <!-- Нижний колонтитул -->
 <div class = "footer-left" style = "font-size: 70%; color: white; width:50%;">ГУУ, ИИС, кафедра ММЭУ</div>
-<div class = "footer-right" style = "font-size: 70%; color: white; width:50%;">весенний семестр 2017/2018</div>
+<div class = "footer-right" style = "font-size: 70%; color: white; width:50%;">весенний семестр 2018/2019</div>
+
 
 Приложения в shiny  
 ========================================================
@@ -52,8 +54,8 @@ slide.number <- 1
 - Скрипт на R -> интерактивная html-страница  
 - Знание html необязательно  
 - Можно размещать онлайн на ресурсах Gist, shinyapps.io, публиковать как пакеты для R или просто отсылать архивом   
-- Примеры приложений: [https://shiny.rstudio.com/](https://shiny.rstudio.com/)   
-- Ещё примеры: [https://shiny.rstudio.com/gallery/](https://shiny.rstudio.com/gallery/)   
+- Примеры приложений: [https://shiny.rstudio.com/gallery/](https://shiny.rstudio.com/gallery/)   
+- Ещё примеры: [https://aksyuk.shinyapps.io/import_app/](https://aksyuk.shinyapps.io/import_app/), [https://aksyuk.shinyapps.io/worldmap_gdp/](https://aksyuk.shinyapps.io/worldmap_gdp/)     
 
 <!-- Нижний колонтитул -->
 ```{r include = F}
@@ -61,6 +63,7 @@ slide.number <- slide.number + 1
 ```
 <div class = "footer-left" style = "font-size: 70%;"><em>`r str.footer.left`</em></div>
 <div class = "footer-right" style = "font-size: 70%;">`r slide.number`</div>
+
 
 Приложения в shiny  
 ========================================================
@@ -77,6 +80,7 @@ slide.number <- slide.number + 1
 ```
 <div class = "footer-left" style = "font-size: 70%;"><em>`r str.footer.left`</em></div>
 <div class = "footer-right" style = "font-size: 70%;">`r slide.number`</div>
+
 
 План практики 
 ========================================================
