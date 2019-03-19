@@ -1,10 +1,9 @@
 ---
 title: "Интерактивные карты с GVis и leaflet"
-author: "Svetlana Aksyuk"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
-    smart: false
+    self_contained: no
 ---
 
 Перевод примера с [RPubs](http://rpubs.com/gallery/googleVis) на русский язык с изменениями и дополнениями.  
@@ -12,12 +11,15 @@ output:
 ## Интерактивная картограмма  
 Построена на [данных по импорту сливочного масла в РФ](https://github.com/aksyuk/R-data/blob/master/COMTRADE/CodeBook_040510-Imp-RF-comtrade.md) за период с 2010 по 2016 гг. (в стоимостном выражении).  
 
-```{r Интерактивная картограмма, results = 'asis', message = F, cashe = T}
+```{r Интерактивная картограмма, results = 'asis', warning = F, message = F, cashe = T}
 # загрузка пакетов
 library('data.table')
+# devtools::install_github('mages/googleVis')
 library('googleVis')
 # library('dplyr')
 library('leaflet')
+
+suppressPackageStartupMessages(library(googleVis))
 
 # загружаем файл с данными по импорту масла в РФ (2010 - 2015)
 fileURL <- './data/040510-Imp-RF-comtrade.csv'
@@ -51,10 +53,14 @@ TG <- gvisMerge(g.tbl, g.chart,
                 tableOptions = 'bgcolor=\"#CCCCCC\" cellspacing=10')
 
 # вставляем результат в html-документ
-print(TG, 'chart')
+TG
+
+# cat(TG$html$chart, file = "TG.html")
 ```
 
-## Карта на основе leaflet  
+
+## Карта на основе leaflet    
+
 На этой карте показаны местоположения зданий Российской академии народного хозяйства и государственной службы при Президенте Российской Федерации в Москве. Увеличьте масштаб, чтобы развернуть юго-западный угол, где расположен главный кампус.   
 
 ```{r Карта на основе leaflet, results = 'asis', message = F}

@@ -27,16 +27,31 @@ output:
 knitr::opts_chunk$set(
     echo = T,
     comment = "#>",
-    collapse = T,
-    fig.align = 'center'
+    collapse = T
+    # fig.align = 'center'
     # fig.height = 4,
     # fig.width = 4
 )
 
 # пакеты
 library('Cairo')
-library('dismo')    # gmap() для загрузки Google карты
-library('raster')   # функции для работы с растровыми картами
+library('maptools')          # инструменты для создания картограмм
+library('sp')                # функция spplot()
+library('RColorBrewer')      # цветовые палитры
+library('lattice')
+# установка и сборка пакета «gpclib»
+# install.packages('gpclib', type = 'source')
+library('gpclib')
+require('rgdal')                 # функция readOGR()
+require('plyr')                  # функция join()
+library('ggplot2')               # функция ggplot()
+library('mapproj')               # работа с проекциями карт
+library('scales')                # функция pretty_breaks()
+
+gpclibPermit()
+
+# library('dismo')    # gmap() для загрузки Google карты
+# library('raster')   # функции для работы с растровыми картами
 
 # директории
 if (!dir.exists('./plots')) {
@@ -100,168 +115,449 @@ png.height <- 400
 
 * Global Land One-kilometer Base Elevation (GLOBE) -- глобальная цифровая модель рельефа от независимых разработчиков, которая объединяет данные из открытых источников (<http://www.ngdc.noaa.gov/mgg/topo/report/>).    
 
-\ \ \ \ \ В работе с картами часто возникает необходимость сделать карту стран мира или их регионов, чтобы наглядно представить экономические и социальные показатели цветовой заливкой. Такие визуальные представления называют *хороплетами*, и они часто оказываются нагляднее таблиц. В R хороплет можно простроить несколькими способами, но самым гибким является обработка Shape-файлов – популярного формата хранения геоданных в векторном формате. Обработка Shape-файлов напрямую довольно затратна в вычислительном плане, но позволяет подогнать карту под любые требования.    
+\ \ \ \ \ В работе с картами часто возникает необходимость сделать карту стран мира или их регионов, чтобы наглядно представить экономические и социальные показатели цветовой заливкой. Такие визуальные представления называют *хороплетами*, и они часто оказываются нагляднее таблиц. В R хороплет можно простроить несколькими способами, но самым гибким является обработка Shape-файлов -- популярного формата хранения геоданных в векторном формате. Обработка Shape-файлов напрямую довольно затратна в вычислительном плане, но позволяет подогнать карту под любые требования.    
 
 \ \ \ \ \ В этой практике мы познакомимся с некоторыми способами создания неподвижных картограмм. В R есть также инструменты для создания интерактивных карт, и их мы рассмотрим в следующей практике.    
 
 \ \ \ \ \ Для начала стоит разобраться на простом примере, как работать с географическими координатами и проекциями.    
 
 
-### Пример работы с растровой картой    
+### Работа с векторной картой    
 
-\ \ \ \ \ **Пример №1**. Загрузим карту мира от Google Earth и нанесём на неё несколько меридианов и параллелей в окрестностях экватора и нулевого меридиана, используя проекцию Меркатора. Нам понадобятся два пакета:    
-
+\ \ \ \ \ **Пример №1**. Построим картограмму регионов Республики Беларусь. Воспользуемся данными проекта www.gadm.org/ (Global Administrative Areas). С сайта проекта можно загрузить карты административных районов стран мира в формате ShapeFile, либо, зная код страны по стандарту ISO 3166-1, воспользоваться прямой ссылкой и загрузить данные в рабочую область R.
+Нам понадобится пакет «maptools» [^11]:   
+     
 
 ```{r paragraph-01-chunk-01-1, eval = F}
-# library('dismo')    # gmap() для загрузки Google карты
-library('ggmap')
-library('raster')   # функции для работы с растровыми картами
+library('maptools')     # инструменты для создания картограмм
 ```
 
-\ \ \ \ \ Загрузка карты всего мира займёт много памяти, поэтому заранее создадим «рамку» для нужного участка карты. Эта рамка задаётся в координатах широты и долготы, причём северная широта и восточная долгота имеют знак плюс, а южная широта и западная долгота – знак минус. Загрузим участок карты от 20° западной долготы до 20° восточной, и от 20° южной широты до 20° северной.    
+\ \ \ \ \ На сайте <http://www.gadm.org/country> выберем нужную страну и формат файла (Рис. 1). В списке форматов также присутствует опция «R (SpartialPolygonsDataFrame)», которой мы воспользуемся позже.        
 
-```{r paragraph-01-chunk-01-2-hidden, include = F}
-long.min <- -20     # западная долгота, левая граница карты
-long.max <- 20      # восточная долгота, правая граница карты
-lat.min <- -20      # южная широта, нижняя граница карты
-lat.max <- 20       # северная широта, верхняя граница карты
+![Рис.1](./pics/pic-01.png) 
 
-center <- c(mean(lat.min, lat.max), mean(long.min, long.max))
+\ \ \ \ \ На странице, которая открывается после нажатия кнопки «Ok», есть ссылка на файл («download»). Скопируем её и загрузим файл скриптом R:    
 
-register_google(key = 'AIzaSyAoA94NtNJtR5gQ3VGs3GrWE9Zv_cU_qyc')
 
-map <- get_map(location = center, zoom = 6, maptype = 'terrain',
-               source = 'google', messaging = TRUE)
-
-# строим график
-Cairo('./plots/plot-01.png', width = png.width, height = png.height)
-ggmap(map)      # Рис. 1
-dev.off()
+```{r paragraph-01-chunk-01-2}
+# ссылка на файл
+ShapeFileURL <- 
+ "http://biogeo.ucdavis.edu/data/gadm2.8/shp/BLR_adm_shp.zip"
+# создаём директорию 'data' и скачиваем
+if (!file.exists('./data')) dir.create('./data')
+if (!file.exists('./data/BLR_adm_shp.zip')) {
+    download.file(ShapeFileURL, 
+                  destfile = './data/BLR_adm_shp.zip')}
 ```
 
-```{r paragraph-01-chunk-01-2, eval = F}
-long.min <- -20     # западная долгота, левая граница карты
-long.max <- 20      # восточная долгота, правая граница карты
-lat.min <- -20      # южная широта, нижняя граница карты
-lat.max <- 20       # северная широта, верхняя граница карты
+\ \ \ \ \ Файл, который мы скачали -- это архив формата «.zip». Распакуем его.     
 
-register_google(key = 'AIzaSyAoA94NtNJtR5gQ3VGs3GrWE9Zv_cU_qyc')
-
-# делаем "рамку" для участка карты
-e <- extent(long.min, long.max, lat.min, lat.max)
-# загружаем заданный участок спутниковой карты с Google Maps
-g <- gmap(e, type = 'satellite')
-
-# строим график
-plot(g, interpolate = TRUE)      # Рис. 1
+```{r paragraph-01-chunk-01-3}
+# распаковать архив
+unzip('./data/BLR_adm_shp.zip', exdir = './data/BLR_adm_shp')
+# посмотреть список файлов распакованного архива
+dir('./data/BLR_adm_shp')
 ```
 
-![Рис.1. Карта мира (`plot()`) в окрестностях 0 параллели и 0 меридиана](./plots/plot-01.png)    
+\ \ \ \ \ Формат ShapeFile -- это набор файлов с расширениями «.cpg», «.csv», «.dbf», «.prj», «.shp», «.shx», причём объекты разных типов (точки, линии, полигоны и другие) хранятся в разных файлах.     
 
-\ \ \ \ \ Добавим меридианы и параллели: -20, -10, 0, 10, 20. Сначала создадим фрейм с двумя столбцами: долготой и широтой. Линии на рисунке обозначим точками, каждая из которых соответствует строке фрейма (Рис. 2).    
+\ \ \ \ \ Главным является файл «.shp», который содержит данные о геометрии объектов. В файле «.dbf» хранятся атрибуты объектов. Элементы двух файлов связаны: атрибуты первого объекта, который хранится в первом кортеже «.shp» (т.е. смещение по строкам 0 в «.shp») хранятся в первом кортеже «.dbf» (смещение по строкам также 0). Существует связь взаимно однозначное соответствие между кортежами геометрии и кортежами атрибутов. Файл «.prj» -- это проекция геометрических компонент. Проекции особенно важны, если нужно совместить несколько карт из разных файлов (источников) [^12].    
 
-```{r paragraph-01-chunk-01-3-hidden, include = F}
-# координаты для параллелей и меридианов
-meridian <- data.frame(x = rep(seq(long.min, long.max, by = 10), 
-                               each = 200), 
-                  y = rep(seq(lat.min, lat.max, length = 200), 5))
-parallel <- data.frame(x = rep(seq(long.min, long.max, 
-                                   length = 200), 5),
-                       y = rep(seq(lat.min, lat.max, by = 10), 
-                               each = 200))
-
-# строим график
-Cairo('./plots/plot-02.png', width = png.width, height = png.height)
-plot(g, interpolate = TRUE)
-
-# наносим линии (точечный пунктир)
-points(Mercator(long), col = 'gray', pch = '.')
-points(Mercator(lat), col = 'gray', pch = '.')
-# поверх белым цветом рисуем нулевые параллель и меридиан
-meridian0 <- data.frame(x = rep((long.max + long.min) / 2, 200), 
-                        y = seq(lat.min, lat.max, length = 200))
-parallel0 <- data.frame(x = seq(long.min, long.max, length = 200), 
-                        y = rep((lat.max + lat.min) / 2, 200))
-points(Mercator(meridian0), col = 'white', pch = '.', cex = 2)
-points(Mercator(parallel0), col = 'white', pch = '.', cex = 2)
-
-dev.off()
+\ \ \ \ \ В нашем случае данные представлены ещё и на нескольких уровнях иерархии (индексы 0, 1, 2 в названиях файлов). Попробуем разобраться, чем отличаются уровни иерархии друг от друга. Воспользуемся функцией `plot()`, чтобы сделать простейшее представление контурных карт. Результат, показанный на Рис. 2, далёк от совершенства, однако он даёт понять, что уровень «0» -- это границы государства, уровень «1» -- регионов, «2» -- административных районов.    
+```{r paragraph-01-chunk-01-4, eval = F}
+# прочитать данные уровней 0, 1, 2
+Regions0 <- readShapePoly("./data/BLR_adm_shp/BLR_adm0.shp")
+Regions1 <- readShapePoly("./data/BLR_adm_shp/BLR_adm1.shp")
+Regions2 <- readShapePoly("./data/BLR_adm_shp/BLR_adm2.shp")
+# контурные карты для разных уровней иерархии
+par(mfrow = c(1, 3))
+par(oma = c(0, 0, 0, 0))
+par(mar = c(0, 0, 1, 0))
+plot(Regions0, main = 'adm0', asp = 1.8)
+plot(Regions1, main = 'adm1', asp = 1.8)
+plot(Regions2, main = 'adm2', asp = 1.8)             # Рис. 2
+par(mfrow = c(1, 1))
 ```
-
-```{r paragraph-01-chunk-01-3, eval = F}
-# координаты для параллелей и меридианов
-meridian <- data.frame(x = rep(seq(long.min, long.max, by = 10), 
-                               each = 200), 
-                  y = rep(seq(lat.min, lat.max, length = 200), 5))
-parallel <- data.frame(x = rep(seq(long.min, long.max, 
-                                   length = 200), 5),
-                       y = rep(seq(lat.min, lat.max, by = 10), 
-                               each = 200))
-# наносим линии (точечный пунктир)
-points(Mercator(long), col = 'gray', pch = '.')
-points(Mercator(lat), col = 'gray', pch = '.')
-# поверх белым цветом рисуем нулевые параллель и меридиан
-meridian0 <- data.frame(x = rep((long.max + long.min) / 2, 200), 
-                        y = seq(lat.min, lat.max, length = 200))
-parallel0 <- data.frame(x = seq(long.min, long.max, length = 200), 
-                        y = rep((lat.max + lat.min) / 2, 200))
-points(Mercator(meridian0), col = 'white', pch = '.', cex = 2)
-points(Mercator(parallel0), col = 'white', pch = '.', cex = 2)
-```
-
-![Рис.2. Карта мира (`plot()`) с сеткой параллелей и меридианов](./plots/plot-02.png)    
-
-\ \ \ \ \ Проекция Меркатора плоха тем, что, чем дальше от экватора, тем сильнее искажаются расстояния. Сравните с картой на Рис. 3, на которой изображены те же параллели от 40° до 80° северной широты.    
-
-\ \ \ \ \ Способы проецирования карт не ограничиваются проекцией Меркатора (см., например, [^8], [^9], [^10]), и мы рассмотрим их на векторных данных и графиках из пакета «ggplot2» далее.    
-
-\ \ \ \ \ В данном примере мы убедились, что границы карты и отдельные точки можно задавать в координатах широты и долготы, и при этом необходимо пересчитывать координаты в проекцию карты.    
 
 ```{r paragraph-01-chunk-01-4-hidden, include = F}
-# То же гораздо севернее
-long.min <- -20      # западная долгота, левая граница карты
-long.max <- 20       # восточная долгота, правая граница карты
-lat.min <- 40        # южная широта, нижняя граница карты
-lat.max <- 80        # северная широта, верхняя граница карты
+# прочитать данные уровней 0, 1, 2
+Regions0 <- readShapePoly("./data/BLR_adm_shp/BLR_adm0.shp")
+Regions1 <- readShapePoly("./data/BLR_adm_shp/BLR_adm1.shp")
+Regions2 <- readShapePoly("./data/BLR_adm_shp/BLR_adm2.shp")
 
-# делаем "рамку" для участка карты
-e <- extent(long.min, long.max, lat.min, lat.max)
-# загружаем заданный участок спутниковой карты с Google Maps
-g <- gmap(e, type = 'satellite')
-
-Cairo('./plots/plot-03.png', width = png.width, height = png.height)
-# строим график
-plot(g, interpolate = TRUE)
-
-# координаты для параллелей и меридианов
-meridian <- data.frame(x = rep(seq(long.min, long.max, by = 10), 
-                               each = 200), 
-                  y = rep(seq(lat.min, lat.max, length = 200), 5))
-parallel <- data.frame(x = rep(seq(long.min, long.max, 
-                                   length = 200), 5),
-                       y = rep(seq(lat.min, lat.max, by = 10), 
-                               each = 200))
-# наносим линии (точечный пунктир)
-points(Mercator(long), col = 'gray', pch = '.')
-points(Mercator(lat), col = 'gray', pch = '.')
-# поверх белым цветом рисуем нулевые параллель и меридиан
-meridian0 <- data.frame(x = rep((long.max + long.min) / 2, 200), 
-                        y = seq(lat.min, lat.max, length = 200))
-parallel0 <- data.frame(x = seq(long.min, long.max, length = 200), 
-                        y = rep((lat.max + lat.min) / 2, 200))
-points(Mercator(meridian0), col = 'white', pch = '.', cex = 2)
-points(Mercator(parallel0), col = 'white', pch = '.', cex = 2)
-
+Cairo('./plots/plot-01.png', width = png.width, height = 150)
+# контурные карты для разных уровней иерархии
+par(mfrow = c(1, 3))
+par(oma = c(0, 0, 0, 0))
+par(mar = c(0, 0, 1, 0))
+plot(Regions0, main = 'adm0', asp = 1.8)
+plot(Regions1, main = 'adm1', asp = 1.8)
+plot(Regions2, main = 'adm2', asp = 1.8)             # Рис. 2
+par(mfrow = c(1, 1))
 dev.off()
 ```
 
-![Рис.2. Карта мира (`plot()`) между 40 и 80 градусами южной широты](./plots/plot-03.png)    
+![Рис.2](./plots/plot-01.png)
+
+\ \ \ \ \ Итак, если нас интересует уровень регионов Республики Беларусь, нужно выбирать файлы с индексом «1» в названии. Далее работаем с данными из объекта Regions1, остальные можно удалить.    
+
+```{r paragraph-01-chunk-01-5}
+# убрать лишние объекты из памяти
+rm(Regions0, Regions2)
+```
+
+\ \ \ \ \ Если мы посмотрим структуру объекта «Regions1» с помощью функции `str()`, увидим, что это объект, состоящий из нескольких слотов, каждый из которых имеет собственную сложную структуру. Из соображений экономии места, приведём здесь только имена этих слотов.    
+
+```{r paragraph-01-chunk-01-6}
+# имена слотов
+slotNames(Regions1)
+```
+
+\ \ \ \ \ Слот «`data`» -- это фрейм, который содержит сводную информацию о регионах, представленных в файле. При обращении к слоту нужно отделять его имя от имени объекта символом «`@`».    
+
+```{r paragraph-01-chunk-01-7}
+# слот "данные"
+Regions1@data
+```
+
+\ \ \ \ \ Координаты областей содержатся в слоте «`Regions@polygons`» («полигоны»). Чтобы сделать картограмму Республики Беларусь, на которой каждый регион залит своим цветом, нужно сделать из переменной «`NAME_1`» фактор, поскольку мы будем использовать её значения для цветов.    
+
+```{r paragraph-01-chunk-01-8}
+# делаем фактор из имён областей (т.е. нумеруем их)
+Regions1@data$NAME_1 <- as.factor(Regions1@data$NAME_1)
+# результат
+Regions1@data$NAME_1
+```
+
+\ \ \ \ \ Чтобы построить график, воспользуемся функцией `spplot()` пакета «`sp`» [^13] [^14]. Эта функция использует графическую систему «`lattice`» и предлагает более двадцати аргументов для настройки графика (см. `?spplot`). Мы используем лишь основные, добавив на карту координатную сетку и заливку регионов цветом. Для создания палитры цветов используем функцию `rainbow()`, которая возвращает цвета радуги. Результат более предпочтителен, чем график, построенный выше средствами базовой графической системы R.    
+
+```{r paragraph-01-chunk-01-9, eval = F}
+# загрузка пакета
+library('sp')                          # функция spplot()
+```
+
+
+```{r paragraph-01-chunk-01-10-hidden, include = F}
+Cairo('./plots/plot-03.png', width = png.width, height = 200)
+# строим картограмму
+spplot(Regions1,       # объект 'SpatialPolygonsDataFrame'
+       'NAME_1',       # показанная цветом переменная
+       scales = list(draw = T),        # рисовать координатную сетку
+       col.regions = rainbow(n = 6)   # цвета для заливки
+       )         # Рис. 3
+dev.off()
+```
+
+```{r paragraph-01-chunk-01-10, eval = F}
+# загрузка пакета
+library('sp')                          # функция spplot()
+# строим картограмму
+spplot(Regions1,       # объект 'SpatialPolygonsDataFrame'
+       'NAME_1',       # показанная цветом переменная
+       scales = list(draw = T), # рисовать координатную сетку
+       col.regions = rainbow(n = 6)  # цвета для заливки
+       )                                          # Рис. 3
+```
+
+![Рис.3](./plots/plot-03.png)
+
+\ \ \ \ \ **Пример №2**. Построим картограмму регионов Республики Беларусь, раскрасив регионы по значениям непрерывного количественного показателя. Код основан на примере из книги [^15].    
+
+\ \ \ \ \ На сайте <www.belstat.gov.by> приводится официальная статистика социально-экономических показателей Республики Беларусь. Сборник «Регионы Республики Беларусь, 2015» [^16] [^17] содержит годовую статистику на конец 2014 года в разрезе регионов. Несколько показателей за 2014 год сохранены в файле с расширением «.csv», размещённом на <github.com/aksyuk>.    
+
+```{r paragraph-01-chunk-01-11}
+# загружаем статистику с показателями по регионам
+fileURL <- 'https://raw.githubusercontent.com/aksyuk/R-data/master/STATE_STAT/BLR_Regions_2014.csv'
+stat.Regions <- read.csv(fileURL,               # ссылка
+                         sep = ';', dec = ',',  # разделители
+                         as.is = T)    # не переводить строки 
+                                       # в факторы
+# содержимое таблицы
+stat.Regions
+```
+
+\ \ \ \ \ Регионы в файле со статистикой «`stat.Regions`» (столбец «`Region`») называются так же, как в объекте с картой «`Regions`» (столбец «`NAME_1`»). Добавим численность населения в слот «`Regions@data`», используя столбцы с названиями регионов как ключи.    
+
+```{r paragraph-01-chunk-01-12}
+# вносим данные в файл карты
+Regions1@data <- merge(Regions1@data, stat.Regions, 
+                       by.x = 'NAME_1', by.y = 'Region')
+```
+
+\ \ \ \ \ Осталось задать палитру цветов и построить картограмму.    
+
+```{r paragraph-01-chunk-01-13-hidden, include = F}
+# задаём палитру
+mypalette <- colorRampPalette(c('whitesmoke', 'coral3'))
+
+Cairo('./plots/plot-04.png', width = png.width, height = 200)
+# строим картограмму численности населения
+spplot(Regions1, 'Population.people',
+       col.regions = mypalette(20),  # цветовая шкала 
+                                     # (20 градаций)
+       col = 'coral4',               # цвет контурных линий 
+       par.settings = list(axis.line = list(col = NA)) # без осей
+       )      # Рис. 4
+dev.off()
+```
+
+```{r paragraph-01-chunk-01-13, eval = F}
+# загрузка пакета
+library('RColorBrewer')                # цветовые палитры
+# задаём палитру
+mypalette <- colorRampPalette(c('whitesmoke', 'coral3'))
+# строим картограмму численности населения
+spplot(Regions1, 'Population.people',
+       col.regions = mypalette(20),  # цветовая шкала 
+                                     # (20 градаций)
+       col = 'coral4',               # цвет контурных линий 
+       par.settings = list(axis.line = list(col = NA)) # без 
+                                                       # осей
+)      # Рис. 4
+```
+
+
+![Рис.4](./plots/plot-04.png)
+
+\ \ \ \ \ Эта картограмма будет нагляднее, если добавить на неё названия регионов. Поскольку `spplot()` строит график средствами «`lattice`», для добавления текста на картограмму понадобится добавить в вызов функции аргумент «`panel`».    
+
+```{r paragraph-01-chunk-01-14-hidden, include = F}
+Cairo('./plots/plot-05.png', width = png.width, height = 200)
+# то же - с названиями областей
+spplot(Regions1, 'Population.people', 
+       col.regions = mypalette(16), col = 'coral4', 
+       main = 'Численность населения, человек',
+       panel = function(x, y, z, subscripts, ...) {
+         panel.polygonsplot(x, y, z, subscripts, ...)
+         sp.text(coordinates(Regions1),
+                 Regions1$NAME_1[subscripts])}
+)      # Рис. 8
+
+# пример окончен, удаляем большой объект из памяти
+rm(Regions1)
+dev.off()
+```
+
+```{r paragraph-01-chunk-01-14, eval = F}
+# то же - с названиями областей
+spplot(Regions1, 'Population.people', 
+       col.regions = mypalette(16), col = 'coral4', 
+       main = 'Численность населения, человек',
+       panel = function(x, y, z, subscripts, ...) {
+         panel.polygonsplot(x, y, z, subscripts, ...)
+         sp.text(coordinates(Regions1),
+                 Regions1$NAME_1[subscripts])}
+)      # Рис. 8
+
+# пример окончен, удаляем большой объект из памяти
+rm(Regions1)
+```
+
+![Рис.5](./plots/plot-05.png)
+
+\ \ \ \ \ **Пример №3**. Построим последний график с помощью пакета «ggplot2».    
+
+\ \ \ \ \ Функция `ggplot()`, с помощью которой мы построим картограмму, требует, чтобы данные были представлены в формате фрейма и содержали как переменные локаций, так и показатель для заливки регионов цветом.   
+
+\ \ \ \ \ Сначала импортируем данные заново с помощью функции `readOGR()` пакета «`rgdal`». В результате получим объект в формате «`SpatialPolygonsDataFrame`», который преобразуем во фрейм функцией `fortify()`. Эта функция создаст таблицу, в которой каждая строка будет соответствовать точке какого-то из полигонов. Координаты точек хранятся в переменных «`long`» (долгота) и «`lat`» (широта), а название полигона (т.е. региона), к которому относится точка, записан в столбце «`group`».    
+
+\ \ \ \ \ В операционной системе Windows для работы `fortify()` нужно установить пакет «`gpclib`». Для его корректной установки нужно установить программу «Rtools», последнюю версию которой можно скачать по адресу: <https://cran.r-project.org/bin/windows/Rtools/>. Инструкции по установке: <https://github.com/stan-dev/rstan/wiki/Install-Rtools-for-Windows> (необходимы права администратора).    
+
+```{r paragraph-01-chunk-01-15-hidden, include = F}
+# Формируем данные для ggplot
+#  читаем ShapeFile из папки, с указанием уровня иерархии
+Regions <- readOGR(dsn = './data/BLR_adm_shp',   # папка
+                   layer = 'BLR_adm1')           # уровень 
+# создаём столбец-ключ id для связи с другими таблицами
+#  (названия регионов из столбца NAME_1)
+Regions@data$id <- Regions@data$NAME_1
+# преобразовываем SpatialPolygonsDataFrame в data.frame
+Regions.points <- fortify(Regions, region = 'id')
+# добавляем к координатам сведения о регионах
+Regions.df <- join(Regions.points, Regions@data, by = 'id')
+# добавляем к координатам значения показателя для заливки
+#  (численность населения из фрейма stat.Regions)
+stat.Regions$id <- stat.Regions$Region
+Regions.df <- join(Regions.df, 
+                   stat.Regions[, c('id', 
+                                    'Population.people')], 
+                   by = 'id')
+# имена столбцов фрейма (выделены нужные для графика)
+names(Regions.df)
+```
+
+
+```{r paragraph-01-chunk-01-15, eval = F}
+# установка и сборка пакета «gpclib»
+install.packages('gpclib', type = "source")
+library('gpclib')
+# включаем остальные пакеты
+require('rgdal')                 # функция readOGR()
+require('plyr')                  # функция join()
+library('ggplot2')               # функция ggplot()
+library('mapproj')               # работа с проекциями карт
+library('scales')                # функция pretty_breaks()
+
+gpclibPermit()
+
+# Формируем данные для ggplot
+#  читаем ShapeFile из папки, с указанием уровня иерархии
+Regions <- readOGR(dsn = './data/BLR_adm_shp',   # папка
+                   layer = 'BLR_adm1')           # уровень 
+# создаём столбец-ключ id для связи с другими таблицами
+#  (названия регионов из столбца NAME_1)
+Regions@data$id <- Regions@data$NAME_1
+# преобразовываем SpatialPolygonsDataFrame в data.frame
+Regions.points <- fortify(Regions, region = 'id')
+# добавляем к координатам сведения о регионах
+Regions.df <- join(Regions.points, Regions@data, by = 'id')
+# добавляем к координатам значения показателя для заливки
+#  (численность населения из фрейма stat.Regions)
+stat.Regions$id <- stat.Regions$Region
+Regions.df <- join(Regions.df, 
+                   stat.Regions[, c('id', 
+                                    'Population.people')], 
+                   by = 'id')
+# имена столбцов фрейма (выделены нужные для графика)
+names(Regions.df)
+```
+
+\ \ \ \ \ Мы воспользовались функциями:    
+
+* `readOGR()` -- читает данные в формате векторной карты. В качестве первого аргумента указана папка с файлами. Второй аргумент «`layer`» -- это названия файлов необходимого уровня иерархии без расширений.    
+
+* `fortify()` -- в общем случае применяет модель к таблице данных. Мы с помощью этой функции перевели данные из полигонов во фрейм данных. Второй аргумент («`region`») -- название переменной, в которой в исходном файле данных записаны идентификаторы регионов (полигонов).    
+
+* `join()` -- объединяет две таблицы (первые два аргумента) по ключевому столбцу, который должен присутствовать в обеих (аргумент «`by`», в нашем случае это столбец «`id`»).    
+
+\ \ \ \ \ Для графика нам понадобится ещё один фрейм, с координатами центров регионов и с их названиями, чтобы сделать подписи. В пакете «sp» есть функция `coordinates()`, которая как раз рассчитывает центроиды полигонов:    
+
+```{r paragraph-01-chunk-01-16}
+# координаты центров полигонов (для подписей регионов)
+centroids.df <- as.data.frame(coordinates(Regions))
+# названия регионов (идут в том же порядке, в каком 
+#  считались центроиды
+centroids.df$id <- Regions@data$id
+# заменяем имена переменных, созданные по умолчанию
+colnames(centroids.df) <- c('long', 'lat', 'id')
+```
+
+\ \ \ \ \ Осталось построить картограмму. В ней будет три слоя:    
+
+1. Полигоны, залитые фоном. Исходные данные -- фрейм «Regions.df», функция геометрии -- `geom_polygon()`.    
+
+2. Контуры полигонов. Исходные данные -- фрейм «`Regions.df`», функция геометрии -- `geom_path()`. Эта функция соединяет точки в том порядке, в котором они записаны в таблице.    
+
+3. Подписи полигонов. Исходные данные -- фрейм «centroids.df», функция геометрии -- `geom_text()`.    
+
+\ \ \ \ \ Поскольку один график будет построен на двух фреймах данных и будет включать три слоя, нам придётся в каждой из функций геометрии явно прописывать аргументы `data` (таблица данных) и `aes` (роли переменных).    
+
+\ \ \ \ \ Мы используем ещё несколько дополнительных функций для отображения карты:    
+
+* `coord_map()` с аргументом «`projection = 'gilbert'`» переводит карту в проекцию Гильберта.    
+
+* `scale_fill_distiller()` задаёт заливку регионов по градиенту, взяв за основу оранжево-красную палитру из пакета «RColorBrewer» (аргумент «`palette = 'OrRd'`»), которую переворачивает от светлого (наименьшие значения) к тёмному (наибольшие значения) аргументом «`direction = 1`». Третий аргумент создаёт разбиение непрерывной шкалы показателя «численность населения», по значениям которого делается заливка, на 5 интервалов («`breaks = pretty_breaks(n = 5)`»). Результат виден на легенде графика.    
+
+* `labs()` -- названия осей и графика.    
+
+\ \ \ \ \ Результат показан на Рис. 5.    
+
+```{r paragraph-01-chunk-01-17-hidden, include = F}
+Cairo('./plots/plot-06.png', width = png.width, height = 200)
+# создаём график
+gp <- ggplot() + 
+    geom_polygon(data = Regions.df, 
+                 aes(long, lat, group = group, 
+                     fill = Population.people)) +
+    geom_path(data = Regions.df, 
+              aes(long, lat, group = group),
+              color = 'coral4') +
+    coord_map(projection = 'gilbert') +
+    scale_fill_distiller(palette = 'OrRd',
+                         direction = 1,
+                         breaks = pretty_breaks(n = 5)) +
+    labs(x = 'Долгота', y = 'Широта', 
+         title = "Численность населения, человек") +
+    geom_text(data = centroids.df, 
+                       aes(long, lat, label = id))
+# выводим график
+gp             # Рис. 6
+dev.off()
+```
+
+```{r paragraph-01-chunk-01-17, eval = F}
+# создаём график
+gp <- ggplot() + 
+    geom_polygon(data = Regions.df, 
+                 aes(long, lat, group = group, 
+                     fill = Population.people)) +
+    geom_path(data = Regions.df, 
+              aes(long, lat, group = group),
+              color = 'coral4') +
+    coord_map(projection = 'gilbert') +
+    scale_fill_distiller(palette = 'OrRd',
+                         direction = 1,
+                         breaks = pretty_breaks(n = 5)) +
+    labs(x = 'Долгота', y = 'Широта', 
+         title = "Численность населения, человек") +
+    geom_text(data = centroids.df, 
+                       aes(long, lat, label = id))
+# выводим график
+gp             # Рис. 6
+```
+
+![Рис.6](./plots/plot-06.png)
+
+\ \ \ \ \ Подытоживая, отметим, что нами были рассмотрены далеко не все возможности создания картограмм, однако этого вполне достаточно для решения иллюстративных задач на региональной статистике.    
+
+\ \ \ \ \ Несколько примеров работы с картами в R на русском языке можно найти по ссылкам:    
+
+1. R: хороплет-карта России с увеличенной европейской частью. URL: <https://habrahabr.ru/post/201012/>.    
+
+2. Построение страновых хороплет-карт (choropleth maps) с помощью пакета rworldmap в статистическом пакете R. <http://quantviews.blogspot.ru/2013/02/choropleth-maps-rworldmap-r.html>.    
+
+3. Приложение на Shinyapps (R): хороплет-карта России в пару кликов. URL: <https://tolmach.shinyapps.io/ruschor/>.
 
 
 
+## Упражнения   
 
+### Упражнение 2   
 
+\ \ \ \ \ С помощью «knitr» создать html-отчёт с короткими пояснениями к данным и с картой, построенной двумя способами: 1) функцией `spplot()`; 2) функцией `ggplot()` (данные по вариантам, которые перечислены ниже). В отчёт включить код загрузки данных. Данные можно взять из сборников Росстата «Регионы России: социально-экономические показатели» [^20] и сохранить в .csv файле в репозитории на github, либо загружить данные в R напрямую с Росстата функцией из репозитория: <https://github.com/nillsondg/r_gks_stat_data>. Разместить отчёт на RPubs, его код – на github, и отправить ссылки на них на почту s.aksuk@kiber-guu.ru.   
 
+\ \ \ \ \ Распределение баллов за задание:    
+
+* есть код загрузки данных:4 балла;   
+
+* есть график: 5 баллов;   
+
+* отчёт размещён на RPubs: 2 балла.   
+
+\ \ \ \ \ **Варианты:**    
+
+1. Карта-хороплет регионов РФ, показатель – любой из раздела «Население».   
+
+1. Карта-хороплет регионов РФ, показатель – любой из раздела «Труд».   
+
+1.	Карта-хороплет регионов РФ, показатель – любой из раздела «Уровень жизни населения».   
+
+1.	Карта-хороплет регионов РФ, показатель – любой из раздела «Образование».   
+
+1.	Карта-хороплет регионов РФ, показатель – любой из раздела «Здравоохрание».    
+1.	Карта-хороплет регионов РФ, показатель – любой из раздела «Окружающая среда».   
+
+1.	Карта-хороплет регионов РФ, показатель – любой из раздела «Валовой региональный продукт».   
+
+1.	Карта-хороплет регионов РФ, показатель – любой из раздела «Сельское и лесное хозяйство».   
+
+1.	Карта-хороплет регионов РФ, показатель – любой из раздела «Транспорт».   
+
+1.	Карта-хороплет регионов РФ, показатель – любой из раздела «Наука и инновации».   
+
+1.	Карта-хороплет регионов РФ, показатель – любой из раздела «Промышленное производство».   
+
+1.	Карта-хороплет регионов РФ, показатель – любой из раздела «Строительство».   
 
 
 
@@ -273,36 +569,35 @@ dev.off()
 
 [^3]: Robert J. Hijmans. Introduction to the 'raster' package (version 2.5-2) December 18, 2015. URL: <https://cran.r-project.org/web/packages/raster/vignettes/Raster.pdf>    
 
-[^4] Package ‘rgdal’. December 21, 2015 / CRAN. URL: <https://cran.r-project.org/web/packages/rgdal/rgdal.pdf>    
+[^4]: Package ‘rgdal’. December 21, 2015 / CRAN. URL: <https://cran.r-project.org/web/packages/rgdal/rgdal.pdf>    
 
-[^5] Robin Lovelace, James Cheshire and others. Introduction to visualising spatial data in R V. 1.2, June, 2015. URL: <ftp://cran.r-project.org/pub/R/doc/contrib/intro-spatial-rl.pdf>    
+[^5]: Robin Lovelace, James Cheshire and others. Introduction to visualising spatial data in R V. 1.2, June, 2015. URL: <ftp://cran.r-project.org/pub/R/doc/contrib/intro-spatial-rl.pdf>    
 
-[^6] GDAL / Материал из Википедии — свободной энциклопедии. URL: <https://ru.wikipedia.org/wiki/GDAL>    
+[^6]: GDAL / Материал из Википедии — свободной энциклопедии. URL: <https://ru.wikipedia.org/wiki/GDAL>    
 
-[^7] GDAL/OGR Info Sheet. URL: <http://www.osgeo.org/gdal_ogr>   
+[^7]: GDAL/OGR Info Sheet. URL: <http://www.osgeo.org/gdal_ogr>   
 
-[^8] Ликбез по картографическим проекциям с картинками / Хабрахабр. URL: <https://habrahabr.ru/post/235283/>    
+[^8]: Ликбез по картографическим проекциям с картинками / Хабрахабр. URL: <https://habrahabr.ru/post/235283/>    
 
-[^9] Что твои любимые проекции говорят о тебе / Перевод комикса xkcd. URL: <http://joyreactor.cc/post/169188 (оригинал: https://xkcd.com/977/)>    
+[^9]: Что твои любимые проекции говорят о тебе / Перевод комикса xkcd. URL: <http://joyreactor.cc/post/169188 (оригинал: https://xkcd.com/977/)>    
 
-[^10] Miscellaneous Map Projections / www.csiss.org. URL: <http://www.csiss.org/map-projections/Miscellaneous.html>    
+[^10]: Miscellaneous Map Projections / www.csiss.org. URL: <http://www.csiss.org/map-projections/Miscellaneous.html>    
 
-[^11] Roger Bivand and Nicholas Lewin-Koh (2016). maptools:  Tools for Reading and Handling Spatial Objects. R package version 0.8-39. <https://CRAN.R-project.org/package=maptools>    
+[^11]: Roger Bivand and Nicholas Lewin-Koh (2016). maptools:  Tools for Reading and Handling Spatial Objects. R package version 0.8-39. <https://CRAN.R-project.org/package=maptools>    
 
-[^12] Ben Carlson. Plotting polygon shapefiles / github.com. URL: <https://github.com/hadley/ggplot2/wiki/plotting-polygon-shapefiles>    
+[^12]: Ben Carlson. Plotting polygon shapefiles / github.com. URL: <https://github.com/hadley/ggplot2/wiki/plotting-polygon-shapefiles>    
 
-[^13] Pebesma, E.J., R.S. Bivand, 2005. Classes and methods for spatial data in R. R News 5 (2), <http://cran.r-project.org/doc/Rnews/>    
+[^13]: Pebesma, E.J., R.S. Bivand, 2005. Classes and methods for spatial data in R. R News 5 (2), <http://cran.r-project.org/doc/Rnews/>    
 
-[^14] Roger S. Bivand, Edzer Pebesma, Virgilio Gomez-Rubio, 2013. Applied spatial data analysis with R, Second edition. Springer, NY. <http://www.asdar-book.org/>    
+[^14]: Roger S. Bivand, Edzer Pebesma, Virgilio Gomez-Rubio, 2013. Applied spatial data analysis with R, Second edition. Springer, NY. <http://www.asdar-book.org/>    
 
-[^15] С.Э. Мастицкий, В.К. Шитиков, Статистический анализ и визуализация данных с помощью R. URL: <http://www.ievbras.ru/ecostat/Kiril/R/Mastitsky%20and%20Shitikov%202014.pdf>    
+[^15]: С.Э. Мастицкий, В.К. Шитиков, Статистический анализ и визуализация данных с помощью R. URL: <http://www.ievbras.ru/ecostat/Kiril/R/Mastitsky%20and%20Shitikov%202014.pdf>    
+[^16]: Регионы Республики Беларусь, 2015. Том 1. URL: <http://www.belstat.gov.by/ofitsialnaya-statistika/regiony-respubliki-belarus/publikatsii/index_726/>    
 
-[^16] Регионы Республики Беларусь, 2015. Том 1. URL: <http://www.belstat.gov.by/ofitsialnaya-statistika/regiony-respubliki-belarus/publikatsii/index_726/>    
+[^17]: Регионы Республики Беларусь, 2015. Том 2. URL: <http://www.belstat.gov.by/ofitsialnaya-statistika/regiony-respubliki-belarus/publikatsii/index_732/>    
 
-[^17] Регионы Республики Беларусь, 2015. Том 2. URL: <http://www.belstat.gov.by/ofitsialnaya-statistika/regiony-respubliki-belarus/publikatsii/index_732/>    
+[^18]: Dynamic Graphics with the googleVis Package / RPubs. URL: <http://rpubs.com/gallery/googleVis>    
 
-[^18] Dynamic Graphics with the googleVis Package / RPubs. URL: <http://rpubs.com/gallery/googleVis>    
+[^19]: Markus Gesmann and Diego de Castillo. Using the Google Visualisation API with R. The R Journal, 3(2):40-44, December 2011.URL: <http://journal.r-project.org/archive/2011-2/RJournal_2011-2_Gesmann+de~Castillo.pdf>    
 
-[^19] Markus Gesmann and Diego de Castillo. Using the Google Visualisation API with R. The R Journal, 3(2):40-44, December 2011.URL: <http://journal.r-project.org/archive/2011-2/RJournal_2011-2_Gesmann+de~Castillo.pdf>    
-
-[^20] Регионы России. Социально-экономические показатели / gks.ru. URL: <http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1138623506156>    
+[^20]: Регионы России. Социально-экономические показатели / gks.ru. URL: <http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1138623506156>    
