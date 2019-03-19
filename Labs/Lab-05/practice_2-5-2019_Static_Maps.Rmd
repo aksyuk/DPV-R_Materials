@@ -1,0 +1,308 @@
+---
+title: "Аналитический пакет R. Графические системы в R: пакеты base, lattice, ggplot2"
+author: "С.А.Суязова (Аксюк), [s.aksuk@kiber-guu.ru](mailto:s.aksuk@kiber-guu.ru)"
+date: "`r format(Sys.time(), '%d %b, %Y')`"
+tags: "R[^1], r-project, RStudio"  
+output:
+  word_document:
+    pandoc_args: ["--smart"]
+    reference_docx: ../Шаблон.docx
+    toc: yes
+---
+
+Ключевые слова: R[^1], r-project, RStudio  
+
+Версия 2.0.0 (2019)  
+
+Примеры выполнены R версии `r paste0(R.version$major, '.', R.version$minor)`, "`r R.version$nickname`".  
+
+Версия RStudio: 1.1.453.  
+
+Все ссылки действительны на 19 марта 2019 г.  
+
+Файл с макетом кода для этой практики: [lab_2-5-2019_before.R]()     
+
+
+```{r setup, include = F}
+knitr::opts_chunk$set(
+    echo = T,
+    comment = "#>",
+    collapse = T,
+    fig.align = 'center'
+    # fig.height = 4,
+    # fig.width = 4
+)
+
+# пакеты
+library('Cairo')
+library('dismo')    # gmap() для загрузки Google карты
+library('raster')   # функции для работы с растровыми картами
+
+# директории
+if (!dir.exists('./plots')) {
+    dir.create('./plots/')
+}
+
+# функция для форматирования чисел в тексте (2 знака после запятой)
+comma <- function(x) {
+    format(x, nsmall = 2, digits = 2, big.mark = ' ', decimal.mark = ',')
+}
+
+# функция для записи файла в UTF-8
+# source: https://tomizonor.wordpress.com/2013/04/17/file-utf8-windows/
+BOM <- charToRaw('\xEF\xBB\xBF')
+writeUtf8 <- function(x, file, bom = F) {
+  con <- file(file, "wb")
+  if (bom) writeBin(BOM, con, endian = "little")
+  writeBin(charToRaw(x), con, endian = "little")
+  close(con)
+}
+
+# размеры графиков
+png.width <- 400
+png.height <- 400
+```
+
+##### Новая страница    
+
+## Создание статических картограмм         
+
+### Коротко о форматах хранения геоданных    
+
+\ \ \ \ \ В данной практике рассматриваются приёмы изображения данных на карте средствами R. При создании карты мы будем иметь дело с двумя источниками данных: во-первых, это экономические, социальные или иные показатели, привязанные к определённым точкам или территориям; во-вторых, сами геоданные. Форматы хранения геоданных (или данных GIS -- геоинформационных систем), делятся на два класса: растровые и векторные [^2]. Ниже перечислены лишь некоторые из существующих форматов файлов, которые поддерживаются пакетами R.        
+
+1. **Растровые** (альтернативное англоязычное название -- grid, от слова «сетка»): GeoTIFF, ESRI, ENVI, ERDAS (пакеты «raster» [^3], «rgdal» [^4]). Данные в растровых форматах хранятся в таблицах, где каждая ячейка содержит информацию о цвете одного растра (пикселя) картинки. В таблице также может храниться дополнительная информация о пикселях: непрерывные переменные (как, например, средняя температура), дискретные переменные (статус использования земель), а также ссылки на связанные данные из других таблиц. Растровые форматы плохо масштабируемы и занимают в десятки раз больше места, чем векторные (в зависимости от разрешения), однако для их обработки требуется меньше вычислительных ресурсов.    
+
+2. **Векторные** (или spatial, т.е. «пространственный»), к которым относятся Shapefile и GeoJSON (пакеты «rgdal», «rgeos» [^5]). В отличие от растровых форматов, используют не пиксельное, а геометрическое представление объектов в виде точек, линий и полигонов. Занимают меньше места и дают больше возможностей, от масштабирования до изменения координатной сетки, однако и требуют больших вычислительных мощностей.    
+
+\ \ \ \ \ В упомянутом пакете «rgdal» реализован интерфейс для работы с открытой библиотекой GDAL/OGR (Geospatial Data Abstraction Library -- библиотека абстракции гео-пространственных данных [^6]), функционал которой позволяет работать более чем с 50 растровыми (GDAL) и 20 векторными (OGR) форматами [^7].   
+\ \ \ \ \ Стоит упомянуть некоторые открытые источники геоданных:    
+
+* Геоданные от русскоязычного проекта GIS-Lab (<http://gis-lab.info/qa.html#gis_data>);    
+
+* OpenStreetMap -- открытая база административных границ, городов с точностью до улиц, которая поддерживается национальными агентствами и учреждениями Австрии, Канады, Финляндии, Франции, Нидерландов, Новой Зеландии, России, Словении, Южной Африки, Великобритании и других стран (<http://www.openstreetmap.org/>);    
+
+* Google Earth -- глобальная база геоданных от Google (<https://www.google.com/earth/>);    
+
+* GSHHS -- Глобальная непротиворечивая иерархическая база данных береговых линий высокого разрешения -- содержит информацию о береговых линиях океанов, озёр, рек и о границах государств (<http://www.ngdc.noaa.gov/mgg/shorelines/gshhs.html>);    
+
+* Global Administrative Areas -- база границ административно-территориального деления (<http://www.gadm.org/country>);    
+
+* База Программы ООН по окружающей среде предоставляет данные по наличию и использованию водных, лесных и других природных ресурсов, в том числе в формате Shapefile (<http://geodata.grid.unep.ch/>);    
+
+* Открытая база компании MapCruzin -- границы регионов, города и статистика по населению (весь мир); более подробные данные представлены по США (<http://www.mapcruzin.com/>);    
+
+* База свободной геоинформационной системы DIVA-GIS (<http://www.diva-gis.org/Data>);    
+
+* База данных Natural Earth -- геоданные с атрибутами, предназначенные для создания карт небольшого масштаба (<http://www.naturalearthdata.com/>);    
+
+* Свободная база топонимов, включает более восьми миллионов названий географических объектов (<http://geodata.grid.unep.ch/>);    
+
+* Global Land One-kilometer Base Elevation (GLOBE) -- глобальная цифровая модель рельефа от независимых разработчиков, которая объединяет данные из открытых источников (<http://www.ngdc.noaa.gov/mgg/topo/report/>).    
+
+\ \ \ \ \ В работе с картами часто возникает необходимость сделать карту стран мира или их регионов, чтобы наглядно представить экономические и социальные показатели цветовой заливкой. Такие визуальные представления называют *хороплетами*, и они часто оказываются нагляднее таблиц. В R хороплет можно простроить несколькими способами, но самым гибким является обработка Shape-файлов – популярного формата хранения геоданных в векторном формате. Обработка Shape-файлов напрямую довольно затратна в вычислительном плане, но позволяет подогнать карту под любые требования.    
+
+\ \ \ \ \ В этой практике мы познакомимся с некоторыми способами создания неподвижных картограмм. В R есть также инструменты для создания интерактивных карт, и их мы рассмотрим в следующей практике.    
+
+\ \ \ \ \ Для начала стоит разобраться на простом примере, как работать с географическими координатами и проекциями.    
+
+
+### Пример работы с растровой картой    
+
+\ \ \ \ \ **Пример №1**. Загрузим карту мира от Google Earth и нанесём на неё несколько меридианов и параллелей в окрестностях экватора и нулевого меридиана, используя проекцию Меркатора. Нам понадобятся два пакета:    
+
+
+```{r paragraph-01-chunk-01-1, eval = F}
+# library('dismo')    # gmap() для загрузки Google карты
+library('ggmap')
+library('raster')   # функции для работы с растровыми картами
+```
+
+\ \ \ \ \ Загрузка карты всего мира займёт много памяти, поэтому заранее создадим «рамку» для нужного участка карты. Эта рамка задаётся в координатах широты и долготы, причём северная широта и восточная долгота имеют знак плюс, а южная широта и западная долгота – знак минус. Загрузим участок карты от 20° западной долготы до 20° восточной, и от 20° южной широты до 20° северной.    
+
+```{r paragraph-01-chunk-01-2-hidden, include = F}
+long.min <- -20     # западная долгота, левая граница карты
+long.max <- 20      # восточная долгота, правая граница карты
+lat.min <- -20      # южная широта, нижняя граница карты
+lat.max <- 20       # северная широта, верхняя граница карты
+
+center <- c(mean(lat.min, lat.max), mean(long.min, long.max))
+
+register_google(key = 'AIzaSyAoA94NtNJtR5gQ3VGs3GrWE9Zv_cU_qyc')
+
+map <- get_map(location = center, zoom = 6, maptype = 'terrain',
+               source = 'google', messaging = TRUE)
+
+# строим график
+Cairo('./plots/plot-01.png', width = png.width, height = png.height)
+ggmap(map)      # Рис. 1
+dev.off()
+```
+
+```{r paragraph-01-chunk-01-2, eval = F}
+long.min <- -20     # западная долгота, левая граница карты
+long.max <- 20      # восточная долгота, правая граница карты
+lat.min <- -20      # южная широта, нижняя граница карты
+lat.max <- 20       # северная широта, верхняя граница карты
+
+register_google(key = 'AIzaSyAoA94NtNJtR5gQ3VGs3GrWE9Zv_cU_qyc')
+
+# делаем "рамку" для участка карты
+e <- extent(long.min, long.max, lat.min, lat.max)
+# загружаем заданный участок спутниковой карты с Google Maps
+g <- gmap(e, type = 'satellite')
+
+# строим график
+plot(g, interpolate = TRUE)      # Рис. 1
+```
+
+![Рис.1. Карта мира (`plot()`) в окрестностях 0 параллели и 0 меридиана](./plots/plot-01.png)    
+
+\ \ \ \ \ Добавим меридианы и параллели: -20, -10, 0, 10, 20. Сначала создадим фрейм с двумя столбцами: долготой и широтой. Линии на рисунке обозначим точками, каждая из которых соответствует строке фрейма (Рис. 2).    
+
+```{r paragraph-01-chunk-01-3-hidden, include = F}
+# координаты для параллелей и меридианов
+meridian <- data.frame(x = rep(seq(long.min, long.max, by = 10), 
+                               each = 200), 
+                  y = rep(seq(lat.min, lat.max, length = 200), 5))
+parallel <- data.frame(x = rep(seq(long.min, long.max, 
+                                   length = 200), 5),
+                       y = rep(seq(lat.min, lat.max, by = 10), 
+                               each = 200))
+
+# строим график
+Cairo('./plots/plot-02.png', width = png.width, height = png.height)
+plot(g, interpolate = TRUE)
+
+# наносим линии (точечный пунктир)
+points(Mercator(long), col = 'gray', pch = '.')
+points(Mercator(lat), col = 'gray', pch = '.')
+# поверх белым цветом рисуем нулевые параллель и меридиан
+meridian0 <- data.frame(x = rep((long.max + long.min) / 2, 200), 
+                        y = seq(lat.min, lat.max, length = 200))
+parallel0 <- data.frame(x = seq(long.min, long.max, length = 200), 
+                        y = rep((lat.max + lat.min) / 2, 200))
+points(Mercator(meridian0), col = 'white', pch = '.', cex = 2)
+points(Mercator(parallel0), col = 'white', pch = '.', cex = 2)
+
+dev.off()
+```
+
+```{r paragraph-01-chunk-01-3, eval = F}
+# координаты для параллелей и меридианов
+meridian <- data.frame(x = rep(seq(long.min, long.max, by = 10), 
+                               each = 200), 
+                  y = rep(seq(lat.min, lat.max, length = 200), 5))
+parallel <- data.frame(x = rep(seq(long.min, long.max, 
+                                   length = 200), 5),
+                       y = rep(seq(lat.min, lat.max, by = 10), 
+                               each = 200))
+# наносим линии (точечный пунктир)
+points(Mercator(long), col = 'gray', pch = '.')
+points(Mercator(lat), col = 'gray', pch = '.')
+# поверх белым цветом рисуем нулевые параллель и меридиан
+meridian0 <- data.frame(x = rep((long.max + long.min) / 2, 200), 
+                        y = seq(lat.min, lat.max, length = 200))
+parallel0 <- data.frame(x = seq(long.min, long.max, length = 200), 
+                        y = rep((lat.max + lat.min) / 2, 200))
+points(Mercator(meridian0), col = 'white', pch = '.', cex = 2)
+points(Mercator(parallel0), col = 'white', pch = '.', cex = 2)
+```
+
+![Рис.2. Карта мира (`plot()`) с сеткой параллелей и меридианов](./plots/plot-02.png)    
+
+\ \ \ \ \ Проекция Меркатора плоха тем, что, чем дальше от экватора, тем сильнее искажаются расстояния. Сравните с картой на Рис. 3, на которой изображены те же параллели от 40° до 80° северной широты.    
+
+\ \ \ \ \ Способы проецирования карт не ограничиваются проекцией Меркатора (см., например, [^8], [^9], [^10]), и мы рассмотрим их на векторных данных и графиках из пакета «ggplot2» далее.    
+
+\ \ \ \ \ В данном примере мы убедились, что границы карты и отдельные точки можно задавать в координатах широты и долготы, и при этом необходимо пересчитывать координаты в проекцию карты.    
+
+```{r paragraph-01-chunk-01-4-hidden, include = F}
+# То же гораздо севернее
+long.min <- -20      # западная долгота, левая граница карты
+long.max <- 20       # восточная долгота, правая граница карты
+lat.min <- 40        # южная широта, нижняя граница карты
+lat.max <- 80        # северная широта, верхняя граница карты
+
+# делаем "рамку" для участка карты
+e <- extent(long.min, long.max, lat.min, lat.max)
+# загружаем заданный участок спутниковой карты с Google Maps
+g <- gmap(e, type = 'satellite')
+
+Cairo('./plots/plot-03.png', width = png.width, height = png.height)
+# строим график
+plot(g, interpolate = TRUE)
+
+# координаты для параллелей и меридианов
+meridian <- data.frame(x = rep(seq(long.min, long.max, by = 10), 
+                               each = 200), 
+                  y = rep(seq(lat.min, lat.max, length = 200), 5))
+parallel <- data.frame(x = rep(seq(long.min, long.max, 
+                                   length = 200), 5),
+                       y = rep(seq(lat.min, lat.max, by = 10), 
+                               each = 200))
+# наносим линии (точечный пунктир)
+points(Mercator(long), col = 'gray', pch = '.')
+points(Mercator(lat), col = 'gray', pch = '.')
+# поверх белым цветом рисуем нулевые параллель и меридиан
+meridian0 <- data.frame(x = rep((long.max + long.min) / 2, 200), 
+                        y = seq(lat.min, lat.max, length = 200))
+parallel0 <- data.frame(x = seq(long.min, long.max, length = 200), 
+                        y = rep((lat.max + lat.min) / 2, 200))
+points(Mercator(meridian0), col = 'white', pch = '.', cex = 2)
+points(Mercator(parallel0), col = 'white', pch = '.', cex = 2)
+
+dev.off()
+```
+
+![Рис.2. Карта мира (`plot()`) между 40 и 80 градусами южной широты](./plots/plot-03.png)    
+
+
+
+
+
+
+
+
+
+[//]: # Концевые сноски
+
+[^1]: R Core Team (2015). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. URL <https://www.R-project.org/>   
+
+[^2]: GIS file formats / from Wikipedia, the free encyclopedia. URL: <https://en.wikipedia.org/wiki/GIS_file_formats>    
+
+[^3]: Robert J. Hijmans. Introduction to the 'raster' package (version 2.5-2) December 18, 2015. URL: <https://cran.r-project.org/web/packages/raster/vignettes/Raster.pdf>    
+
+[^4] Package ‘rgdal’. December 21, 2015 / CRAN. URL: <https://cran.r-project.org/web/packages/rgdal/rgdal.pdf>    
+
+[^5] Robin Lovelace, James Cheshire and others. Introduction to visualising spatial data in R V. 1.2, June, 2015. URL: <ftp://cran.r-project.org/pub/R/doc/contrib/intro-spatial-rl.pdf>    
+
+[^6] GDAL / Материал из Википедии — свободной энциклопедии. URL: <https://ru.wikipedia.org/wiki/GDAL>    
+
+[^7] GDAL/OGR Info Sheet. URL: <http://www.osgeo.org/gdal_ogr>   
+
+[^8] Ликбез по картографическим проекциям с картинками / Хабрахабр. URL: <https://habrahabr.ru/post/235283/>    
+
+[^9] Что твои любимые проекции говорят о тебе / Перевод комикса xkcd. URL: <http://joyreactor.cc/post/169188 (оригинал: https://xkcd.com/977/)>    
+
+[^10] Miscellaneous Map Projections / www.csiss.org. URL: <http://www.csiss.org/map-projections/Miscellaneous.html>    
+
+[^11] Roger Bivand and Nicholas Lewin-Koh (2016). maptools:  Tools for Reading and Handling Spatial Objects. R package version 0.8-39. <https://CRAN.R-project.org/package=maptools>    
+
+[^12] Ben Carlson. Plotting polygon shapefiles / github.com. URL: <https://github.com/hadley/ggplot2/wiki/plotting-polygon-shapefiles>    
+
+[^13] Pebesma, E.J., R.S. Bivand, 2005. Classes and methods for spatial data in R. R News 5 (2), <http://cran.r-project.org/doc/Rnews/>    
+
+[^14] Roger S. Bivand, Edzer Pebesma, Virgilio Gomez-Rubio, 2013. Applied spatial data analysis with R, Second edition. Springer, NY. <http://www.asdar-book.org/>    
+
+[^15] С.Э. Мастицкий, В.К. Шитиков, Статистический анализ и визуализация данных с помощью R. URL: <http://www.ievbras.ru/ecostat/Kiril/R/Mastitsky%20and%20Shitikov%202014.pdf>    
+
+[^16] Регионы Республики Беларусь, 2015. Том 1. URL: <http://www.belstat.gov.by/ofitsialnaya-statistika/regiony-respubliki-belarus/publikatsii/index_726/>    
+
+[^17] Регионы Республики Беларусь, 2015. Том 2. URL: <http://www.belstat.gov.by/ofitsialnaya-statistika/regiony-respubliki-belarus/publikatsii/index_732/>    
+
+[^18] Dynamic Graphics with the googleVis Package / RPubs. URL: <http://rpubs.com/gallery/googleVis>    
+
+[^19] Markus Gesmann and Diego de Castillo. Using the Google Visualisation API with R. The R Journal, 3(2):40-44, December 2011.URL: <http://journal.r-project.org/archive/2011-2/RJournal_2011-2_Gesmann+de~Castillo.pdf>    
+
+[^20] Регионы России. Социально-экономические показатели / gks.ru. URL: <http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1138623506156>    
