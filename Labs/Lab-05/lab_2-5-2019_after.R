@@ -10,61 +10,19 @@
 
 # загрузка пакетов
 library('R.utils')               # gunzip() для распаковки архивов 
-library('dismo')                 # gmap() для загрузки Google карты
-library('raster')                # функции для работы с растровыми картами в R
-library('maptools')              # инструменты для создания картограмм
 library('sp')                    # функция spplot()
+library('ggplot2')               # функция ggplot()
 library('RColorBrewer')          # цветовые палитры
 require('rgdal')                 # функция readOGR()
-require('plyr')                  # функция join()
-library('ggplot2')               # функция ggplot()
+library('broom')                 # функция tidy()
+require('dplyr')                 # функция join()
 library('scales')                # функция pretty_breaks()
 # Rtools: https://cran.r-project.org/bin/windows/Rtools/
-install.packages("gpclib", type = "source")
+# install.packages("gpclib", type = "source")
 library('gpclib')
-library('mapproj')
+library('maptools')
 
 gpclibPermit()
-
-
-# Пример 1 #####################################################################
-
-# Нулевая параллель и нулевой меридиан
-
-long.min <-       # западная долгота, левая граница карты
-long.max <-        # восточная долгота, правая граница карты
-lat.min <-         # южная широта, нижняя граница карты
-lat.max <-         # северная широта, верхняя граница карты
-
-# делаем 'рамку' для участка карты
-
-  
-# загружаем заданный участок спутниковой карты с Google Maps
-
-  
-# график
-
-
-# координаты для параллелей и меридианов 
-meridian <- 
-parallel <- 
-  
-# наносим линии (точечный пунктир)
-
-  
-# поверх белым цветом рисуем нулевые параллель и меридиан
-meridian0 <- 
-parallel0 <- 
-
-# наносим линии (точечный пунктир)
-
-  
-
-# То же гораздо севернее
-long.min <- 
-long.max <- 
-lat.min <- 
-lat.max <- 
 
 
 # Пример 2 #####################################################################
@@ -74,59 +32,61 @@ lat.max <-
 
 # загрузить ShapeFile с http://www.gadm.org
 ShapeFileURL <- "http://biogeo.ucdavis.edu/data/gadm2.8/shp/BLR_adm_shp.zip"
-if(!file.exists('./data')) dir.create('./data')
-if(!file.exists('./data/BLR_adm_shp.zip')) {
+if (!file.exists('./data')) dir.create('./data')
+if (!file.exists('./data/BLR_adm_shp.zip')) {
     download.file(ShapeFileURL, destfile = './data/BLR_adm_shp.zip')
 }
 # распаковать архив
 unzip('./data/BLR_adm_shp.zip', exdir = './data/BLR_adm_shp')
 # посмотреть список файлов распакованного архива
-
+dir('./data/BLR_adm_shp')
 
 # прочитать данные уровней 0, 1, 2
-
-
-
+Regions0 <- readOGR("./data/BLR_adm_shp/BLR_adm0.shp")
+Regions1 <- readOGR("./data/BLR_adm_shp/BLR_adm1.shp")
+Regions2 <- readOGR("./data/BLR_adm_shp/BLR_adm2.shp")
 # контурные карты для разных уровней иерархии
-
-
-
-
+par(mfrow = c(1, 3))
+par(oma = c(0, 0, 0, 0))
+par(mar = c(0, 0, 1, 0))
+plot(Regions0, main = 'adm0', asp = 1.8)
+plot(Regions1, main = 'adm1', asp = 1.8)
+plot(Regions2, main = 'adm2', asp = 1.8)
+par(mfrow = c(1, 1))
 
 # убрать лишние объекты из памяти
-
+rm(Regions0, Regions2)
 
 # структура объекта Regions1
-
-
+str(Regions1)
 
 # имена слотов
-
-
+slotNames(Regions1)
 
 # слот "данные"
-
-
+Regions1@data
 
 # слот "полигоны"
-
-
+str(Regions1@polygons)
 
 # картограмма Беларуси, на которой каждая область залита своим цветом
 # делаем фактор из имён областей (т.е. нумеруем их)
-
-
+Regions1@data$NAME_1 <- as.factor(Regions1@data$NAME_1)
+Regions1@data$NAME_1
 
 # строим картограмму
-
-
-
+spplot(Regions1, 'NAME_1',           # отображаемая переменная
+       scales = list(draw = T),      # отображение координатной сетки
+       col.regions = rainbow(n = 6)  # цвета для заливки
+       )
 
 # вариант с палитрой из пакета ColorBrewer и без координатной сетки
+spplot(Regions1, "NAME_1",
+       col.regions = brewer.pal(6, "Set3"),
+       par.settings = list(axis.line = list(col = NA)))
 
-
-
-
+# больше вариантов палитр на все случаи жизни: 
+# https://moderndata.plot.ly/create-colorful-graphs-in-r-with-rcolorbrewer-and-plotly/
 
 
 # Пример 3 #####################################################################
@@ -135,26 +95,30 @@ unzip('./data/BLR_adm_shp.zip', exdir = './data/BLR_adm_shp')
 
 # загружаем статистику с показателями по регионам
 fileURL <- 'https://raw.githubusercontent.com/aksyuk/R-data/master/STATE_STAT/BLR_Regions_2014.csv'
-stat.Regions <- 
-  
+stat.Regions <- read.csv(fileURL, sep = ';', dec = ',', as.is = T)
+stat.Regions
 
 # вносим данные в файл карты
-
-  
-  
+Regions1@data <- merge(Regions1@data, stat.Regions, by.x = 'NAME_1', by.y = 'Region')
 # задаём палитру
-mypalette <- 
-  
+mypalette <- colorRampPalette(c('whitesmoke', 'coral3'))
 
 # строим картограмму численности населения
-
-  
-  
+spplot(Regions1, 'Population.people',
+       col.regions = mypalette(20),  # определение цветовой шкалы
+       col = 'coral4',               # цвет контурных линий на карте
+       par.settings = list(axis.line = list(col = NA))) # без осей
 
 # то же - с названиями областей
+spplot(Regions1, 'Population.people', 
+       col.regions = mypalette(16), col = 'coral4', 
+       main = 'Численность населения, человек',
+       panel = function(x, y, z, subscripts, ...) {
+         panel.polygonsplot(x, y, z, subscripts, ...)
+         sp.text(coordinates(Regions1), Regions1$NAME_1[subscripts])}
+)
 
-  
-  
+rm(Regions1)
 
 
 
@@ -163,38 +127,45 @@ mypalette <-
 
 # Формируем данные для ggplot
 #  читаем ShapeFile из папки, с указанием уровня
-Regions <- 
-  
-  
+Regions <- readOGR(dsn = './data/BLR_adm_shp',   # папка с файлами .shp,...
+                   layer = 'BLR_adm1')           # уровень иерархии
 # создаём столбец-ключ id для связи с другими таблицами
 #  (названия регионов из столбца NAME_1)
-
-  
+Regions@data$id <- Regions@data$NAME_1
 # преобразовать SpatialPolygonsDataFrame в data.frame
-# разрешить использование функций библиотеки gpclib
-gpclibPermit()
-Regions.points <- 
-  
-  
+# gpclibPermit()
+Regions.points <- tidy(Regions, region = 'id')
 # добавить к координатам сведения о регионах
-
-  
-  
+Regions.df <- merge(Regions.points, Regions@data, by = 'id')
 # добавляем к координатам значения показателя для заливки
 #  (численность населения из фрейма stat.Regions)
-
-  
-  
+stat.Regions$id <- stat.Regions$Region
+Regions.df <- merge(Regions.df, 
+                    stat.Regions[, c('id', 'Population.people')], 
+                    by = 'id')
+names(Regions.df)
 
 # координаты центров полигонов (для подписей регионов)
-centroids.df <- 
-  
+centroids.df <- as.data.frame(coordinates(Regions))
+centroids.df$id <- Regions@data$id
+colnames(centroids.df) <- c('long', 'lat', 'id')
 
 # создаём график
-
-  
+gp <- ggplot() + 
+    geom_polygon(data = Regions.df, 
+                 aes(long, lat, group = group, fill = Population.people)) +
+    geom_path(data = Regions.df, 
+              aes(long, lat, group = group),
+              color = 'coral4') +
+    coord_map(projection = 'gilbert') +
+    scale_fill_distiller(palette = 'OrRd',
+                         direction = 1,
+                         breaks = pretty_breaks(n = 5)) +
+    labs(x = 'Долгота', y = 'Широта', 
+         title = "Численность населения, человек") +
+    geom_text(data = centroids.df, 
+                       aes(long, lat, label = id))
 # выводим график
-
-  
+gp
 
   
