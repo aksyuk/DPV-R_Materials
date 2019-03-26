@@ -135,7 +135,7 @@ Regions <- readOGR(dsn = './data/BLR_adm_shp',   # папка с файлами 
 #  (названия регионов из столбца NAME_1)
 Regions@data$id <- Regions@data$NAME_1
 # преобразовать SpatialPolygonsDataFrame в data.frame
-# gpclibPermit()
+
 Regions.points <- tidy(Regions, region = 'id')
 # добавить к координатам сведения о регионах
 Regions.df <- merge(Regions.points, Regions@data, by = 'id')

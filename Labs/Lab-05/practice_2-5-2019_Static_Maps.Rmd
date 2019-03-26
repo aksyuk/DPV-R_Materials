@@ -20,7 +20,7 @@ output:
 
 Все ссылки действительны на 26 марта 2019 г.  
 
-Файл с макетом кода для этой практики: [lab_2-5-2019_before.R]()     
+Файл с макетом кода для этой практики: [lab_2-5-2019_before.R](https://github.com/aksyuk/DPV-R_Materials/tree/master/Labs/Lab-05)     
 
 
 ```{r setup, include = F}
