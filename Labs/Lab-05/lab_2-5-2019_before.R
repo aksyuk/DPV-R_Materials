@@ -42,48 +42,48 @@ unzip('./data/BLR_adm_shp.zip', exdir = './data/BLR_adm_shp')
 dir('./data/BLR_adm_shp')
 
 # прочитать данные уровней 0, 1, 2
-Regions0 <- readOGR("./data/BLR_adm_shp/BLR_adm0.shp")
-Regions1 <- readOGR("./data/BLR_adm_shp/BLR_adm1.shp")
-Regions2 <- readOGR("./data/BLR_adm_shp/BLR_adm2.shp")
-
+Regions0 <- 
+Regions1 <- 
+Regions2 <- 
+    
 # контурные карты для разных уровней иерархии
 par(mfrow = c(1, 3))
 par(oma = c(0, 0, 0, 0))
 par(mar = c(0, 0, 1, 0))
-plot(Regions0, main = 'adm0', asp = 1.8)
-plot(Regions1, main = 'adm1', asp = 1.8)
-plot(Regions2, main = 'adm2', asp = 1.8)
+
+
+
 par(mfrow = c(1, 1))
 
 # убрать лишние объекты из памяти
-rm(Regions0, Regions2)
+
 
 # структура объекта Regions1
-str(Regions1)
+
 
 # имена слотов
-slotNames(Regions1)
+
 
 # слот "данные"
-Regions1@data
+
 
 # слот "полигоны"
-str(Regions1@polygons)
+
 
 # картограмма Беларуси, на которой каждая область залита своим цветом
 # делаем фактор из имён областей (т.е. нумеруем их)
-Regions1@data$NAME_1 <- as.factor(Regions1@data$NAME_1)
+Regions1@data$NAME_1 <- 
 Regions1@data$NAME_1
 
 # строим картограмму
-spplot(Regions1, 'NAME_1',           # отображаемая переменная
-       scales = list(draw = T),      # отображение координатной сетки
-       col.regions = rainbow(n = 6)  # цвета для заливки
+spplot(
+       scales = list(draw = T),
+       col.regions = rainbow(n = 6)
        )
 
 # вариант с палитрой из пакета ColorBrewer и без координатной сетки
-spplot(Regions1, "NAME_1",
-       col.regions = brewer.pal(6, "Set3"),
+spplot(
+       col.regions = 
        par.settings = list(axis.line = list(col = NA)))
 
 # больше вариантов палитр на все случаи жизни: 
@@ -96,28 +96,28 @@ spplot(Regions1, "NAME_1",
 
 # загружаем статистику с показателями по регионам
 fileURL <- 'https://raw.githubusercontent.com/aksyuk/R-data/master/STATE_STAT/BLR_Regions_2014.csv'
-stat.Regions <- read.csv(fileURL, sep = ';', dec = ',', as.is = T)
+stat.Regions <- 
 stat.Regions
 
 # вносим данные в файл карты
-Regions1@data <- merge(Regions1@data, stat.Regions, 
-                       by.x = 'NAME_1', by.y = 'Region')
+Regions1@data <- 
+    
 # задаём палитру
-mypalette <- colorRampPalette(c('whitesmoke', 'coral3'))
+mypalette <- 
 
 # строим картограмму численности населения
-spplot(Regions1, 'Population.people',
+spplot(
        col.regions = mypalette(20),  # определение цветовой шкалы
        col = 'coral4',               # цвет контурных линий на карте
        par.settings = list(axis.line = list(col = NA))) # без осей
 
 # то же - с названиями областей
-spplot(Regions1, 'Population.people', 
+spplot( 
        col.regions = mypalette(16), col = 'coral4', 
        main = 'Численность населения, человек',
        panel = function(x, y, z, subscripts, ...) {
-         panel.polygonsplot(x, y, z, subscripts, ...)
-         sp.text(coordinates(Regions1), Regions1$NAME_1[subscripts])}
+         
+         }
 )
 
 rm(Regions1)
@@ -129,36 +129,33 @@ rm(Regions1)
 
 # Формируем данные для ggplot
 #  читаем ShapeFile из папки, с указанием уровня
-Regions <- readOGR(dsn = './data/BLR_adm_shp',   # папка с файлами .shp,...
-                   layer = 'BLR_adm1')           # уровень иерархии
+Regions <- 
+    
 # создаём столбец-ключ id для связи с другими таблицами
 #  (названия регионов из столбца NAME_1)
-Regions@data$id <- Regions@data$NAME_1
+Regions@data$id <- 
 # преобразовать SpatialPolygonsDataFrame в data.frame
-# gpclibPermit()
-Regions.points <- tidy(Regions, region = 'id')
+
+Regions.points <- 
 # добавить к координатам сведения о регионах
-Regions.df <- merge(Regions.points, Regions@data, by = 'id')
+Regions.df <- 
 # добавляем к координатам значения показателя для заливки
 #  (численность населения из фрейма stat.Regions)
-stat.Regions$id <- stat.Regions$Region
-Regions.df <- merge(Regions.df, 
-                    stat.Regions[, c('id', 'Population.people')], 
-                    by = 'id')
+stat.Regions$id <- 
+Regions.df <- 
+    
+    
 names(Regions.df)
 
 # координаты центров полигонов (для подписей регионов)
-centroids.df <- as.data.frame(coordinates(Regions))
-centroids.df$id <- Regions@data$id
+centroids.df <- 
+centroids.df$id <- 
 colnames(centroids.df) <- c('long', 'lat', 'id')
 
 # создаём график
 gp <- ggplot() + 
-    geom_polygon(data = Regions.df, 
-                 aes(long, lat, group = group, fill = Population.people)) +
-    geom_path(data = Regions.df, 
-              aes(long, lat, group = group),
-              color = 'coral4') +
+    geom_polygon() +
+    geom_path() +
     coord_map(projection = 'gilbert') +
     scale_fill_distiller(palette = 'OrRd',
                          direction = 1,

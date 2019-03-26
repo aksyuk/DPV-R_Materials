@@ -20,7 +20,7 @@ output:
 
 Все ссылки действительны на 26 марта 2019 г.  
 
-Файл с макетом кода для этой практики доступен в репозитории <https://github.com/aksyuk/DPV-R_Materials>        
+Файл с макетом кода для этой практики: [lab_2-5-2019_before.R]()     
 
 
 ```{r setup, include = F}
@@ -290,10 +290,7 @@ spplot(Regions1, "NAME_1",
 ```{r paragraph-01-chunk-01-11}
 # загружаем статистику с показателями по регионам
 fileURL <- 'https://raw.githubusercontent.com/aksyuk/R-data/master/STATE_STAT/BLR_Regions_2014.csv'
-stat.Regions <- read.csv(fileURL,               # ссылка
-                         sep = ';', dec = ',',  # разделители
-                         as.is = T)    # не переводить строки 
-                                       # в факторы
+stat.Regions <- read.csv2(fileURL, stringsAsFactors = F)
 # содержимое таблицы
 stat.Regions
 ```
