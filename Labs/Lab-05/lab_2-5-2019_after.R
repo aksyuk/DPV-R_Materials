@@ -17,15 +17,17 @@ require('rgdal')                 # функция readOGR()
 library('broom')                 # функция tidy()
 require('dplyr')                 # функция join()
 library('scales')                # функция pretty_breaks()
-# Rtools: https://cran.r-project.org/bin/windows/Rtools/
-# install.packages("gpclib", type = "source")
+## установка и сборка пакета «gpclib»
+## установить RTools (recommended) отсюда:
+## http://cran.r-project.org/bin/windows/Rtools/
+# install.packages('gpclib', type = 'source')
 library('gpclib')
 library('maptools')
 
 gpclibPermit()
 
 
-# Пример 2 #####################################################################
+# Пример 1 #####################################################################
 # Административная карта Республики Беларусь
 # источник примера: 
 #  http://www.ievbras.ru/ecostat/Kiril/R/Mastitsky%20and%20Shitikov%202014.pdf
@@ -90,13 +92,13 @@ spplot(Regions1, "NAME_1",
 # https://moderndata.plot.ly/create-colorful-graphs-in-r-with-rcolorbrewer-and-plotly/
 
 
-# Пример 3 #####################################################################
+# Пример 2 #####################################################################
 # Административная карта Республики Беларусь, регионы раскрашены
 #  по значениям непрерывного числового показателя
 
 # загружаем статистику с показателями по регионам
 fileURL <- 'https://raw.githubusercontent.com/aksyuk/R-data/master/STATE_STAT/BLR_Regions_2014.csv'
-stat.Regions <- read.csv(fileURL, sep = ';', dec = ',', as.is = T)
+stat.Regions <- read.csv2(fileURL, stringsAsFactors = F)
 stat.Regions
 
 # вносим данные в файл карты
@@ -124,21 +126,24 @@ rm(Regions1)
 
 
 
-# Пример 4 #####################################################################
+# Пример 3 #####################################################################
 # Перестроить последний график из примера 3 средствами ggplot2
 
 # Формируем данные для ggplot
 #  читаем ShapeFile из папки, с указанием уровня
 Regions <- readOGR(dsn = './data/BLR_adm_shp',   # папка с файлами .shp,...
                    layer = 'BLR_adm1')           # уровень иерархии
+
 # создаём столбец-ключ id для связи с другими таблицами
 #  (названия регионов из столбца NAME_1)
+
 Regions@data$id <- Regions@data$NAME_1
 # преобразовать SpatialPolygonsDataFrame в data.frame
-
 Regions.points <- tidy(Regions, region = 'id')
+
 # добавить к координатам сведения о регионах
 Regions.df <- merge(Regions.points, Regions@data, by = 'id')
+
 # добавляем к координатам значения показателя для заливки
 #  (численность населения из фрейма stat.Regions)
 stat.Regions$id <- stat.Regions$Region
