@@ -1,0 +1,129 @@
+---
+title: "Интерактивные карты с GVis, plotly и leaflet"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    self_contained: no
+    css: style.css
+---
+
+```{r setup, warning = F, message = F}
+# загрузка пакетов
+library('data.table')
+library('WDI')
+# devtools::install_github('mages/googleVis')
+library('leaflet')
+suppressPackageStartupMessages(library('googleVis'))
+```
+
+
+## Интерактивная картограмма  
+
+Интерактивная картограмма на данных Всемирного Банка по [ВВП на душу населения в текущих ценах (долл. США)](https://data.worldbank.org/indicator/NY.GDP.PCAP.CD?view=chart) за 2017 год.     
+
+```{r Интерактивная картограмма, results = 'asis', cashe = T}
+
+# данные по ВВП по ППП
+indicator.code <- 'NY.GDP.PCAP.PP.CD'
+DT <- data.table(WDI(indicator = indicator.code, start = 2017, end = 2017))
+
+# все коды стран iso2
+fileURL <- 'https://pkgstore.datahub.io/core/country-list/data_csv/data/d7c9d7cfb42cb69f4422dec222dbbaa8/data_csv.csv'
+all.iso2.country.codes <- read.csv(fileURL, stringsAsFactors = F, 
+                                   na.strings = '.')
+
+# убираем макрорегионы
+DT <- na.omit(DT[iso2c %in% all.iso2.country.codes$Code, ])
+
+# объект: таблица исходных данных
+g.tbl <- gvisTable(data = DT[, -'year'], 
+                   options = list(width = 300, height = 400))
+# объект: интерактивная карта
+g.chart <- gvisGeoChart(data = DT, 
+                        locationvar = 'iso2c', 
+                        hovervar = 'country',
+                        colorvar = indicator.code, 
+                        options = list(width = 500, 
+                                       height = 400, 
+                                       dataMode = 'regions'))
+# размещаем таблицу и карту на одной панели (слева направо)
+TG <- gvisMerge(g.tbl, g.chart, 
+                horizontal = TRUE, 
+                tableOptions = 'bgcolor=\"#CCCCCC\" cellspacing=10')
+
+# вставляем результат в html-документ
+TG
+```
+
+
+## Карта на основе leaflet    
+
+На этой карте показано расположение аптек в г.Уренгой. Список аптек получен с Портала открытых данных РФ, географические координаты определены по адремас с помощью API Яндекс Геокодера.    
+
+```{r Карта с маркерами на основе leaflet, results = 'asis', message = F}
+# картинка-логотип для маркеров объекта
+fileURL <- 'https://github.com/aksyuk/R-data/raw/master/pics/pharmacy-icon.png'
+pharm.icon <- makeIcon(iconUrl = fileURL, 
+                       iconWidth = 31,
+                       iconHeight = 31,
+                       iconAnchorX = 31,
+                       iconAnchorY = 31)
+
+fileURL <- 'https://raw.githubusercontent.com/aksyuk/R-data/master/examples/Urengoy_pharmacies.csv'
+
+DT.loc <- read.csv2(fileURL, stringsAsFactors = F)
+DT.loc$lat <- as.numeric(DT.loc$lat)
+DT.loc$long <- as.numeric(DT.loc$long)
+
+# подписи к объектам с гиперссылками
+map.sites <- paste0(DT.loc$Наименование.объекта, '</br>',
+                    DT.loc$Режим.работы, '</br>',
+                    '<em>', DT.loc$Контактный.телефон, '</em>')
+
+# создаём виджет с картой
+myMap <- DT.loc %>% leaflet(width = 800, height = 800) %>% 
+addTiles() %>% addMarkers(icon = pharm.icon, popup = map.sites)
+
+# рисуем карту
+myMap
+```
+
+Карта построена по данным схемы размещения источников твёрдых бытовых отходов в Ямало-Ненецком автономном округе (Портал открытых данных РФ). Радиусы пропорциональны численности населения на 1 января 2016 года.    
+
+```{r Карта с радиусами на основе leaflet, results = 'asis', message = F}
+fileURL <- 'https://raw.githubusercontent.com/aksyuk/R-data/master/examples/YNao_tbo.csv'
+
+DT.rad <- read.csv2(fileURL, stringsAsFactors = F, na.strings = '-')
+DT.rad <- na.omit(DT.rad)
+
+popups <- paste0('<b>', DT.rad$Наименование.источника.образования.отходов,
+                 '</b></br>', DT.rad$Численность.населения.МО.на.01.01.2016.г.,
+                 ' чел.')
+
+DT.rad %>%
+leaflet() %>%
+addTiles() %>%
+addMarkers(popup = popups,
+           clusterOptions = markerClusterOptions()) %>% 
+addCircles(weight = 1, radius = sqrt(DT.rad$Численность.населения.МО.на.01.01.2016.г.) * 100)
+
+```
+
+
+### Использованы пакеты R  
+<!-- ссылки получены функцией citation('имя_пакета')-->
+  
+1. `r citation('data.table')$textVersion`    
+1. `r citation('WDI')$textVersion`    
+1. `r citation('leaflet')$textVersion`    
+1. `r citation('googleVis')$textVersion`    
+
+### Источники данных   
+
+1. Dynamic Graphics with the googleVis Package <http://rpubs.com/gallery/googleVis>    
+
+1. Дмитрий Храмов, «Сбор данных в Интернете на языке R». – М.: ДМК Пресс, 2017. – 280 с.   
+
+1. Документация по API Геокодера от Яндекс <https://tech.yandex.ru/maps/doc/geocoder/desc/concepts/about-docpage/>   
+
+1. *Simon Munzert*, *Christian Rubba*, *Peter Meisner*, *Dominic Nyhuis* Automated Data Collection with R. Wiley, **2015** <https://books.google.ru/books?id=X-7sBQAAQBAJ&pg=PA96&lpg=PA96&dq=r+xml+xpath+returns+empty&source=bl&ots=OSnRWmFKTR&sig=ACfU3U2wE7shk3mFHrLrlMkFSfwvuAYpEg&hl=ru&sa=X&ved=2ahUKEwiu8_nVmrHhAhUMs4sKHe5vDFIQ6AEwCXoECAkQAQ#v=onepage&q=r%20xml%20xpath%20returns%20empty&f=false>   
