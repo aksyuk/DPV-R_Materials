@@ -17,15 +17,17 @@ require('rgdal')                 # функция readOGR()
 library('broom')                 # функция tidy()
 require('dplyr')                 # функция join()
 library('scales')                # функция pretty_breaks()
-# Rtools: https://cran.r-project.org/bin/windows/Rtools/
-# install.packages("gpclib", type = "source")
+## установка и сборка пакета «gpclib»
+## установить RTools (recommended) отсюда:
+## http://cran.r-project.org/bin/windows/Rtools/
+# install.packages('gpclib', type = 'source')
 library('gpclib')
 library('maptools')
 
 gpclibPermit()
 
 
-# Пример 2 #####################################################################
+# Пример 1 #####################################################################
 # Административная карта Республики Беларусь
 # источник примера: 
 #  http://www.ievbras.ru/ecostat/Kiril/R/Mastitsky%20and%20Shitikov%202014.pdf
@@ -90,7 +92,7 @@ spplot(
 # https://moderndata.plot.ly/create-colorful-graphs-in-r-with-rcolorbrewer-and-plotly/
 
 
-# Пример 3 #####################################################################
+# Пример 2 #####################################################################
 # Административная карта Республики Беларусь, регионы раскрашены
 #  по значениям непрерывного числового показателя
 
@@ -124,7 +126,7 @@ rm(Regions1)
 
 
 
-# Пример 4 #####################################################################
+# Пример 3 #####################################################################
 # Перестроить последний график из примера 3 средствами ggplot2
 
 # Формируем данные для ggplot
@@ -134,17 +136,17 @@ Regions <-
 # создаём столбец-ключ id для связи с другими таблицами
 #  (названия регионов из столбца NAME_1)
 Regions@data$id <- 
+    
 # преобразовать SpatialPolygonsDataFrame в data.frame
-
 Regions.points <- 
+    
 # добавить к координатам сведения о регионах
 Regions.df <- 
+
 # добавляем к координатам значения показателя для заливки
 #  (численность населения из фрейма stat.Regions)
 stat.Regions$id <- 
 Regions.df <- 
-    
-    
 names(Regions.df)
 
 # координаты центров полигонов (для подписей регионов)
