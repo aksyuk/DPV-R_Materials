@@ -11,8 +11,8 @@ output:
 # загрузка пакетов
 library('data.table')
 library('WDI')
-# devtools::install_github('mages/googleVis')
 library('leaflet')
+# devtools::install_github('mages/googleVis')
 suppressPackageStartupMessages(library('googleVis'))
 ```
 
@@ -56,7 +56,7 @@ TG
 ```
 
 
-## Карта на основе leaflet    
+## Карты на основе leaflet    
 
 На этой карте показано расположение аптек в г.Уренгой. Список аптек получен с Портала открытых данных РФ, географические координаты определены по адремас с помощью API Яндекс Геокодера.    
 
@@ -120,7 +120,7 @@ addCircles(weight = 1, radius = sqrt(DT.rad$Численность.населе�
 
 ### Источники данных   
 
-1. Dynamic Graphics with the googleVis Package <http://rpubs.com/gallery/googleVis>    
+1. Dynamic Graphics with the googleVis Package <http://rpubs.com/gallery/googleVis>      
 
 1. Дмитрий Храмов, «Сбор данных в Интернете на языке R». – М.: ДМК Пресс, 2017. – 280 с.   
 

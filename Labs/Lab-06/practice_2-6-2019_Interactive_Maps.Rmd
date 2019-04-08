@@ -1,0 +1,131 @@
+---
+title: "Аналитический пакет R. Графические системы в R: пакеты base, lattice, ggplot2"
+author: "С.А.Суязова (Аксюк), [s.aksuk@kiber-guu.ru](mailto:s.aksuk@kiber-guu.ru)"
+date: "`r format(Sys.time(), '%d %b, %Y')`"
+tags: "R[^1], r-project, RStudio"  
+output:
+  word_document:
+    pandoc_args: ["--smart"]
+    reference_docx: ../Шаблон.docx
+    toc: yes
+---
+
+Ключевые слова: R[^1], r-project, RStudio  
+
+Версия 2.0.0 (2019)  
+
+Примеры выполнены R версии `r paste0(R.version$major, '.', R.version$minor)`, "`r R.version$nickname`".  
+
+Версия RStudio: 1.1.453.  
+
+Все ссылки действительны на 8 апреля 2019 г.  
+
+Файл с макетом кода для этой практики: [lab_2-6-2019_before.Rmd]()     
+
+
+```{r setup, include = F}
+knitr::opts_chunk$set(
+    echo = T,
+    comment = "#>",
+    collapse = T
+    # fig.align = 'center'
+    # fig.height = 4,
+    # fig.width = 4
+)
+
+# пакеты
+# загрузка пакетов
+library('data.table')
+library('WDI')
+library('leaflet')
+# devtools::install_github('mages/googleVis')
+library('googleVis')
+
+# директории
+if (!dir.exists('./plots')) {
+    dir.create('./plots/')
+}
+
+# функция для форматирования чисел в тексте (2 знака после запятой)
+comma <- function(x) {
+    format(x, nsmall = 2, digits = 2, big.mark = ' ', decimal.mark = ',')
+}
+
+# функция для записи файла в UTF-8
+# source: https://tomizonor.wordpress.com/2013/04/17/file-utf8-windows/
+BOM <- charToRaw('\xEF\xBB\xBF')
+writeUtf8 <- function(x, file, bom = F) {
+  con <- file(file, "wb")
+  if (bom) writeBin(BOM, con, endian = "little")
+  writeBin(charToRaw(x), con, endian = "little")
+  close(con)
+}
+
+# размеры графиков
+png.width <- 400
+png.height <- 400
+```
+
+##### Новая страница    
+
+## Динамические карты в "googleVis" и "leaflet"         
+
+\ \ \ \ \ **Пример №1**. На базе примера, данного в [^2], построим несколько динамических карт и включим их в html-документ. Сделаем это средствами пакетов "googleVis" [^3] и "leaflet" [^4][^5].    
+
+\ \ \ \ \ Нам понадобится новый скрипт на языке RMarkdown. Создадим новый файл в формате html с заголовком "Интерактивные карты с GVis и leaflet" и сохраним его под именем "lab_2-6-2019.Rmd".     
+
+\ \ \ \ \ Кроме основного текста с короткими пояснениями, включим в документ три блока кода:     
+
+* "Интерактивная картограмма", который строит карту мира и раскрашивает страны по ВВП на душу населения в текущих ценах (долл. США). Данные для картограммы подтянем из базы данных Всемирного банка с помощью пакета "WDI" [^6].    
+
+* Блок "Карта с маркерами на основе leaflet" отмечает на карте расположение аптек в городе Уренгой (набор данных с Портала открытых данных РФ) [^7].    
+
+* Блок "Карта с радиусами на основе leaflet" строит карту по данным схемы размещения источников твёрдых бытовых отходов в Ямало-Ненецком автономном округе с Портала открытых данных РФ.    
+
+\ \ \ \ \ Данные, которыми мы воспользуемся, можно скачать в R напрямую из соответствующих источников, и в случае статистики Всемирного банка мы так и сделаем. Но чтобы работать с Порталом открытых данных, нужно получить индивидуальный ключ, поэтому для построения карт на базе "leaflet" мы воспользуемся копиями таблиц, размещёнными в репозитории на github.com. Загрузка данных с помощью API с <https://data.gov.ru/> описана в разделе "Импорт данных".     
+
+\ \ \ \ \ Функции пакеты "googleVis", которыми мы воспользуемся, возвращают результат в виде html-кода. Чтобы результаты корректно включились в текст отчёта, добавим блокам кода на языке R опцию "results = 'asis'".
+Ниже приводится код файла "Maps_GVis.Rmd". Получить отчёт в формате html можно, нажав на кнопку "Knit HTML" над окном редактора RStudio (Рис. 1).
+    
+
+
+
+
+## Упражнения   
+
+### Упражнение 5   
+
+\ \ \ \ \ 
+
+
+
+[//]: # Концевые сноски
+
+[^1]: R Core Team (2015). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. URL <https://www.R-project.org/>   
+
+[^2]: Dynamic Graphics with the googleVis Package <http://rpubs.com/gallery/googleVis>     
+
+[^3]: Markus Gesmann and Diego de Castillo. Using the Google Visualisation API with R. The R Journal, 3(2):40-44, December 2011    
+
+[^4]: Joe Cheng, Bhaskar Karambelkar and Yihui Xie (2018). leaflet: Create Interactive Web Maps with the JavaScript 'Leaflet' Library. R package version 2.0.2. <https://CRAN.R-project.org/package=leaflet>    
+
+[^5]: Leaflet for R <https://rstudio.github.io/leaflet/>    
+
+[^6]: Vincent Arel-Bundock (2019). WDI: World Development Indicators (World Bank). R package version 2.6.0. <https://CRAN.R-project.org/package=WDI>    
+
+[^7]: Портал открытых данных РФ <https://data.gov.ru/>    
+
+
+
+
+[^15]: Create Colorful Graphs in R with RColorBrewer and plotly. URL: <https://moderndata.plot.ly/create-colorful-graphs-in-r-with-rcolorbrewer-and-plotly/>    
+
+[^16]: С.Э. Мастицкий, В.К. Шитиков, Статистический анализ и визуализация данных с помощью R. URL: <http://www.ievbras.ru/ecostat/Kiril/R/Mastitsky%20and%20Shitikov%202014.pdf>    
+
+[^17]: Регионы Республики Беларусь, 2015. Том 1. URL: <http://www.belstat.gov.by/ofitsialnaya-statistika/regiony-respubliki-belarus/publikatsii/index_726/>    
+
+[^18]: Регионы Республики Беларусь, 2015. Том 2. URL: <http://www.belstat.gov.by/ofitsialnaya-statistika/regiony-respubliki-belarus/publikatsii/index_732/>    
+
+[^19]: Регионы России. Социально-экономические показатели / gks.ru. URL: <http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1138623506156>    
+
+[^20]: База данных показателей муниципальных образований. URL: <http://www.gks.ru/dbscripts/munst/>   
