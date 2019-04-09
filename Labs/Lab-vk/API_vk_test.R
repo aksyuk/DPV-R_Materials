@@ -6,7 +6,7 @@ library('jsonlite')
 library('XML')
 
 URL.base <- 'http://data.gov.ru/api/'
-API.key <- '7d5e6a0ab1c8e540492c8b7012575bcd'
+API.key <- '86f90929b60dc10d4d07bd26affdcdce'
 
 getOpenDataRF <- function(api.params, url.base = URL.base, api.key = API.key) {
     par <- paste0(api.params, collapse = '/')
@@ -23,7 +23,13 @@ str(datasets)
 
 head(datasets[, c('title', 'identifier')])
 
-dataset_id <- '8911021426-aptekalist'
+
+# dataset_id <- '8911021426-aptekalist'
+# dataset_id <- '8905001855-vetychregdeniy'
+# dataset_id <- '4401168294-oknkosobl'
+# dataset_id <- '3460012716-ZHKHRegistryOverhaul'
+dataset_id <- '2308078236-18dom'
+
 params <- c('dataset', dataset_id)
 dataset <- getOpenDataRF(params)
 
@@ -36,7 +42,16 @@ params <- c(params, mrv)
 content <- c(params, 'content')
 doc <- getOpenDataRF(content)
 head(doc)
+View(doc)
 
+# nrow(doc[grepl('г. Калач-на-Дону', doc$Address), ])
+# nrow(doc[grepl('г. Жирновск', doc$Address), ])
+# nrow(doc[grepl('г. Суровикино', doc$Address), ])
+# nrow(doc[grepl('г. Ленинск', doc$Address), ])
+
+nrow(doc[grepl('Анапа', doc$address), ])
+nrow(doc[grepl('Краснодар', doc$address), ])
+nrow(doc[grepl('Белореченск', doc$address), ])
 
 dataset_id <- '8901017727-shematbo'
 params <- c('dataset', dataset_id, 'version')

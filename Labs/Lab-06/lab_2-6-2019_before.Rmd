@@ -3,7 +3,7 @@ title: "Интерактивные карты с GVis, plotly и leaflet"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
-    self_contained: yes
+    self_contained: no
     css: style.css
 ---
 
@@ -32,32 +32,32 @@ all.iso2.country.codes <- read.csv(fileURL, stringsAsFactors = F,
                                    na.strings = '.')
 
 # убираем макрорегионы
-DT <- na.omit(DT[iso2c %in% all.iso2.country.codes$Code, ])
+DT <- 
 
 # объект: таблица исходных данных
-g.tbl <- gvisTable(data = DT[, -'year'], 
+g.tbl <- gvisTable(data = , 
                    options = list(width = 300, height = 400))
 # объект: интерактивная карта
-g.chart <- gvisGeoChart(data = DT, 
-                        locationvar = 'iso2c', 
-                        hovervar = 'country',
-                        colorvar = indicator.code, 
+g.chart <- gvisGeoChart(data = , 
+                        locationvar = , 
+                        hovervar = ,
+                        colorvar = , 
                         options = list(width = 500, 
                                        height = 400, 
                                        dataMode = 'regions'))
 # размещаем таблицу и карту на одной панели (слева направо)
-TG <- gvisMerge(g.tbl, g.chart, 
+TG <- gvisMerge(, , 
                 horizontal = TRUE, 
                 tableOptions = 'bgcolor=\"#CCCCCC\" cellspacing=10')
 
 # вставляем результат в html-документ
-TG
+
 ```
 
 
 ## Карты на основе leaflet    
 
-На этой карте показано расположение аптек в г.Уренгой. Список аптек получен с Портала открытых данных РФ, географические координаты определены по адресам с помощью API Яндекс Геокодера.    
+На этой карте показано расположение аптек в г.Уренгой. Список аптек получен с Портала открытых данных РФ, географические координаты определены по адремас с помощью API Яндекс Геокодера.    
 
 ```{r Карта с маркерами на основе leaflet, results = 'asis', message = F}
 # картинка-логотип для маркеров объекта
@@ -70,9 +70,9 @@ pharm.icon <- makeIcon(iconUrl = fileURL,
 
 fileURL <- 'https://raw.githubusercontent.com/aksyuk/R-data/master/examples/Urengoy_pharmacies.csv'
 
-DT.loc <- read.csv2(fileURL, stringsAsFactors = F)
-DT.loc$lat <- as.numeric(DT.loc$lat)
-DT.loc$long <- as.numeric(DT.loc$long)
+DT.loc <- 
+DT.loc$lat <-
+DT.loc$long <- 
 
 # подписи к объектам с гиперссылками
 map.sites <- paste0(DT.loc$Наименование.объекта, '</br>',
@@ -80,11 +80,10 @@ map.sites <- paste0(DT.loc$Наименование.объекта, '</br>',
                     '<em>', DT.loc$Контактный.телефон, '</em>')
 
 # создаём виджет с картой
-myMap <- DT.loc %>% leaflet(width = 800, height = 800) %>% 
-addTiles() %>% addMarkers(icon = pharm.icon, popup = map.sites)
+myMap <- 
 
 # рисуем карту
-myMap
+
 ```
 
 Карта построена по данным схемы размещения источников твёрдых бытовых отходов в Ямало-Ненецком автономном округе (Портал открытых данных РФ). Радиусы пропорциональны численности населения на 1 января 2016 года.    
@@ -92,19 +91,14 @@ myMap
 ```{r Карта с радиусами на основе leaflet, results = 'asis', message = F}
 fileURL <- 'https://raw.githubusercontent.com/aksyuk/R-data/master/examples/YNao_tbo.csv'
 
-DT.rad <- read.csv2(fileURL, stringsAsFactors = F, na.strings = '-')
-DT.rad <- na.omit(DT.rad)
+DT.rad <- 
+DT.rad <- 
 
 popups <- paste0('<b>', DT.rad$Наименование.источника.образования.отходов,
                  '</b></br>', DT.rad$Численность.населения.МО.на.01.01.2016.г.,
                  ' чел.')
+# рисуем карту
 
-DT.rad %>%
-leaflet() %>%
-addTiles() %>%
-addMarkers(popup = popups,
-           clusterOptions = markerClusterOptions()) %>% 
-addCircles(weight = 1, radius = sqrt(DT.rad$Численность.населения.МО.на.01.01.2016.г.) * 100)
 ```
 
 
