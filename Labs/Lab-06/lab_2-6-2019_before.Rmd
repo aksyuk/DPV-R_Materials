@@ -14,6 +14,10 @@ library('WDI')
 library('leaflet')
 # devtools::install_github('mages/googleVis')
 suppressPackageStartupMessages(library('googleVis'))
+
+# для загрузки свежей версии pandoc:
+#  https://github.com/pandoc-extras/pandoc-nightly/releases/tag/hash-7c20fab3
+#  архив pandoc-windows-7c20fab3.zip распаковать в RStudio/bin/pandoc
 ```
 
 
