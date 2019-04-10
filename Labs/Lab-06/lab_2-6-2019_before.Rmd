@@ -60,44 +60,44 @@ TG <- gvisMerge(, ,
 На этой карте показано расположение аптек в г.Уренгой. Список аптек получен с Портала открытых данных РФ, географические координаты определены по адремас с помощью API Яндекс Геокодера.    
 
 ```{r Карта с маркерами на основе leaflet, results = 'asis', message = F}
-# картинка-логотип для маркеров объекта
-fileURL <- 'https://github.com/aksyuk/R-data/raw/master/pics/pharmacy-icon.png'
-pharm.icon <- makeIcon(iconUrl = fileURL, 
-                       iconWidth = 31,
-                       iconHeight = 31,
-                       iconAnchorX = 31,
-                       iconAnchorY = 31)
-
-fileURL <- 'https://raw.githubusercontent.com/aksyuk/R-data/master/examples/Urengoy_pharmacies.csv'
-
-DT.loc <- 
-DT.loc$lat <-
-DT.loc$long <- 
-
-# подписи к объектам с гиперссылками
-map.sites <- paste0(DT.loc$Наименование.объекта, '</br>',
-                    DT.loc$Режим.работы, '</br>',
-                    '<em>', DT.loc$Контактный.телефон, '</em>')
-
-# создаём виджет с картой
-myMap <- 
-
-# рисуем карту
+# # картинка-логотип для маркеров объекта
+# fileURL <- 'https://github.com/aksyuk/R-data/raw/master/pics/pharmacy-icon.png'
+# pharm.icon <- makeIcon(iconUrl = fileURL, 
+#                        iconWidth = 31,
+#                        iconHeight = 31,
+#                        iconAnchorX = 31,
+#                        iconAnchorY = 31)
+# 
+# fileURL <- 'https://raw.githubusercontent.com/aksyuk/R-data/master/examples/Urengoy_pharmacies.csv'
+# 
+# DT.loc <- 
+# DT.loc$lat <-
+# DT.loc$long <- 
+# 
+# # подписи к объектам с гиперссылками
+# map.sites <- paste0(DT.loc$Наименование.объекта, '</br>',
+#                     DT.loc$Режим.работы, '</br>',
+#                     '<em>', DT.loc$Контактный.телефон, '</em>')
+# 
+# # создаём виджет с картой
+# myMap <- 
+# 
+# # рисуем карту
 
 ```
 
 Карта построена по данным схемы размещения источников твёрдых бытовых отходов в Ямало-Ненецком автономном округе (Портал открытых данных РФ). Радиусы пропорциональны численности населения на 1 января 2016 года.    
 
 ```{r Карта с радиусами на основе leaflet, results = 'asis', message = F}
-fileURL <- 'https://raw.githubusercontent.com/aksyuk/R-data/master/examples/YNao_tbo.csv'
-
-DT.rad <- 
-DT.rad <- 
-
-popups <- paste0('<b>', DT.rad$Наименование.источника.образования.отходов,
-                 '</b></br>', DT.rad$Численность.населения.МО.на.01.01.2016.г.,
-                 ' чел.')
-# рисуем карту
+# fileURL <- 'https://raw.githubusercontent.com/aksyuk/R-data/master/examples/YNao_tbo.csv'
+# 
+# DT.rad <- 
+# DT.rad <- 
+# 
+# popups <- paste0('<b>', DT.rad$Наименование.источника.образования.отходов,
+#                  '</b></br>', DT.rad$Численность.населения.МО.на.01.01.2016.г.,
+#                  ' чел.')
+# # рисуем карту
 
 ```
 
