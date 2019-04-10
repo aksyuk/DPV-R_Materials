@@ -3,7 +3,7 @@ title: "Интерактивные карты с GVis, plotly и leaflet"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
-    self_contained: no
+    self_contained: yes
     css: style.css
 ---
 
