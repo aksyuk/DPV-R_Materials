@@ -5,7 +5,6 @@ date: "`r format(Sys.time(), '%d %b, %Y')`"
 tags: "R[^1], r-project, RStudio"  
 output:
   word_document:
-    pandoc_args: ["-smart"]
     reference_docx: ../Шаблон.docx
     toc: yes
 ---
