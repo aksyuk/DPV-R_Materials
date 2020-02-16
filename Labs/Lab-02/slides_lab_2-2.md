@@ -35,15 +35,7 @@ font-family: 'Verdana'
 <a href = "mailto:s.aksuk@kiber-guu.ru">s.aksuk@kiber-guu.ru</a>   
    
 
-```{r Подготовка рабочего пространства, include = F}
-library('knitr')
 
-# для колонтитулов: слева -- название лекции...
-str.footer.left <- 'ДПВ "Аналитический пакет R": Очистка и трансформация данных'
-# ...справа -- номер страницы (счётчик на каждом слайде)
-slide.number <- 1
-
-```
 
 <!-- Нижний колонтитул -->
 <div class = "footer-left" style = "font-size: 70%; color: white; width:50%;">ГУУ, ИИС, кафедра ММЭУ</div>
@@ -58,11 +50,9 @@ slide.number <- 1
 - очистка текстовых значений с помощью `gsub()`    
 
 <!-- Нижний колонтитул -->
-```{r include = F}
-slide.number <- slide.number + 1
-```
-<div class = "footer-left" style = "font-size: 70%;"><em>`r str.footer.left`</em></div>
-<div class = "footer-right" style = "font-size: 70%;">`r slide.number`</div>
+
+<div class = "footer-left" style = "font-size: 70%;"><em>ДПВ "Аналитический пакет R": Очистка и трансформация данных</em></div>
+<div class = "footer-right" style = "font-size: 70%;">2</div>
 
 Пакет dplyr
 ========================================================
@@ -73,11 +63,9 @@ slide.number <- slide.number + 1
 - каналы `%>%` уменьшают объём кода  
 
 <!-- Нижний колонтитул -->
-```{r include = F}
-slide.number <- slide.number + 1
-```
-<div class = "footer-left" style = "font-size: 70%;"><em>`r str.footer.left`</em></div>
-<div class = "footer-right" style = "font-size: 70%;">`r slide.number`</div>
+
+<div class = "footer-left" style = "font-size: 70%;"><em>ДПВ "Аналитический пакет R": Очистка и трансформация данных</em></div>
+<div class = "footer-right" style = "font-size: 70%;">3</div>
 
 
 Поиск и замена подстрок в символьных векторах:  
@@ -90,8 +78,6 @@ slide.number <- slide.number + 1
 В шаблоне поиска и замены можно использовать регулярные выражения.   
 
 <!-- Нижний колонтитул -->
-```{r include = F}
-slide.number <- slide.number + 1
-```
-<div class = "footer-left" style = "font-size: 70%;"><em>`r str.footer.left`</em></div>
-<div class = "footer-right" style = "font-size: 70%;">`r slide.number`</div>
+
+<div class = "footer-left" style = "font-size: 70%;"><em>ДПВ "Аналитический пакет R": Очистка и трансформация данных</em></div>
+<div class = "footer-right" style = "font-size: 70%;">4</div>

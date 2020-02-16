@@ -36,15 +36,7 @@ font-family: 'Verdana'
    
 Рубежный контроль: зачёт    
 
-```{r Подготовка рабочего пространства, include = F}
-library('knitr')
 
-# для колонтитулов: слева -- название лекции...
-str.footer.left <- 'ДПВ "Аналитический пакет R": Сбор данных'
-# ...справа -- номер страницы (счётчик на каждом слайде)
-slide.number <- 1
-
-```
 
 <!-- Нижний колонтитул -->
 <div class = "footer-left" style = "font-size: 70%; color: white; width:50%;">ГУУ, ИИС, кафедра ММЭУ</div>
@@ -61,11 +53,9 @@ slide.number <- 1
 - Работа с картами  
 
 <!-- Нижний колонтитул -->
-```{r include = F}
-slide.number <- slide.number + 1
-```
-<div class = "footer-left" style = "font-size: 70%;"><em>`r str.footer.left`</em></div>
-<div class = "footer-right" style = "font-size: 70%;">`r slide.number`</div>
+
+<div class = "footer-left" style = "font-size: 70%;"><em>ДПВ "Аналитический пакет R": Сбор данных</em></div>
+<div class = "footer-right" style = "font-size: 70%;">2</div>
 
 Практика №1: загрузка данных
 ========================================================
@@ -77,11 +67,9 @@ slide.number <- slide.number + 1
 - API на примере базы UN COMTRADE   
 
 <!-- Нижний колонтитул -->
-```{r include = F}
-slide.number <- slide.number + 1
-```
-<div class = "footer-left" style = "font-size: 70%;"><em>`r str.footer.left`</em></div>
-<div class = "footer-right" style = "font-size: 70%;">`r slide.number`</div>
+
+<div class = "footer-left" style = "font-size: 70%;"><em>ДПВ "Аналитический пакет R": Сбор данных</em></div>
+<div class = "footer-right" style = "font-size: 70%;">3</div>
 
 Принципы работы с данными
 ========================================================
@@ -94,11 +82,9 @@ slide.number <- slide.number + 1
 Цель: обеспечить воспроизводимость кода  
 
 <!-- Нижний колонтитул -->
-```{r include = F}
-slide.number <- slide.number + 1
-```
-<div class = "footer-left" style = "font-size: 70%;"><em>`r str.footer.left`</em></div>
-<div class = "footer-right" style = "font-size: 70%;">`r slide.number`</div>
+
+<div class = "footer-left" style = "font-size: 70%;"><em>ДПВ "Аналитический пакет R": Сбор данных</em></div>
+<div class = "footer-right" style = "font-size: 70%;">4</div>
 
 С чем будем работать сегодня 
 ========================================================
@@ -112,8 +98,6 @@ slide.number <- slide.number + 1
 1. github.com (для размещения результатов упражнения №1)   
 
 <!-- Нижний колонтитул -->
-```{r include = F}
-slide.number <- slide.number + 1
-```
-<div class = "footer-left" style = "font-size: 70%;"><em>`r str.footer.left`</em></div>
-<div class = "footer-right" style = "font-size: 70%;">`r slide.number`</div>
+
+<div class = "footer-left" style = "font-size: 70%;"><em>ДПВ "Аналитический пакет R": Сбор данных</em></div>
+<div class = "footer-right" style = "font-size: 70%;">5</div>
