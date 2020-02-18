@@ -13,7 +13,6 @@
 library('dplyr')               # манипуляции с тиббл-таблицами
 library('nycflights13')        # данные по полётам из Нью-Йорка
 library('data.table')          # объекты "таблица данных"
-library('moments')
 
 
 # Преобразование данных с помощью пакета `dplyr` ===============================
@@ -42,7 +41,7 @@ filter(flights, month == 11 | 12)
 filter(flights, month %in% c(11, 12))   
 
 # несколько логических условий на строки
-filter(flights, arr_delay <= 120, dep_delay <= 120)
+filter(flights, arr_delay <= 120, dep_delay >= 180)
 
 
 # Переставляем строки с arrange() ..............................................
@@ -51,7 +50,7 @@ filter(flights, arr_delay <= 120, dep_delay <= 120)
 arrange(flights, year, month, day)
 
 # сортируем по убыванию задержки
-arrange(flights, desc(arr_delay))
+arrange(flights, desc(dep_delay))
 
 # пропуски сортируются в конец таблицы
 df <- tibble(x = c(5, 2, NA))
