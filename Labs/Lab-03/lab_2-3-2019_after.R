@@ -375,12 +375,12 @@ dev.off()
 # ненормальность распределений закономерно усиливается
 df.stats <- data.frame(var = c('Netweight.kg', 'Netweight.kg.median', 
                                'Netweight.kg.mean'),
-                       skew = round(c(skewness(na.omit(DT$Netweight.kg)), 
-                                      skewness(DT$Netweight.kg.median),
-                                      skewness(DT$Netweight.kg.mean)), 2),
-                       kurt = round(c(kurtosis(na.omit(DT$Netweight.kg)), 
-                                      kurtosis(DT$Netweight.kg.median),
-                                      kurtosis(DT$Netweight.kg.mean)), 2),
+                       skew = round(c(skewness(na.omit(DT.import$Netweight.kg)), 
+                                      skewness(DT.import$Netweight.kg.median),
+                                      skewness(DT.import$Netweight.kg.mean)), 2),
+                       kurt = round(c(kurtosis(na.omit(DT.import$Netweight.kg)), 
+                                      kurtosis(DT.import$Netweight.kg.median),
+                                      kurtosis(DT.import$Netweight.kg.mean)), 2),
                        stringsAsFactors = F)
 df.stats
 
@@ -391,9 +391,9 @@ df.stats
 # Пример 4.2 ###################################################################
 
 # переменные: масса поставки и её стоимость
+DT.import[DT.import$Netweight.kg == 0, Netweight.kg := NA]
 x <- DT.import$Trade.Value.USD
 y <- DT.import$Netweight.kg
-y[y == 0] <- NA
 
 # оценка регрессии с помощью МНК
 fit <- lm(y ~ x)
