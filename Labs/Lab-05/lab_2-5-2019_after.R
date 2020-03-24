@@ -17,13 +17,14 @@ require('rgdal')                 # функция readOGR()
 library('broom')                 # функция tidy()
 require('dplyr')                 # функция join()
 library('scales')                # функция pretty_breaks()
+library('mapproj')               # проекции для карт
 ## установка и сборка пакета «gpclib»
 ## установить RTools (recommended) отсюда:
 ## http://cran.r-project.org/bin/windows/Rtools/
 # install.packages('gpclib', type = 'source')
 library('gpclib')
 library('maptools')
-
+# разрешить использовать полигональную геометрию, которая защищена лицензией 
 gpclibPermit()
 
 
@@ -48,7 +49,7 @@ Regions0 <- readOGR("./data/BLR_adm_shp/BLR_adm0.shp")
 Regions1 <- readOGR("./data/BLR_adm_shp/BLR_adm1.shp")
 Regions2 <- readOGR("./data/BLR_adm_shp/BLR_adm2.shp")
 
-# контурные карты для разных уровней иерархии
+# контурные карты для разных уровней иерархии ..................................
 par(mfrow = c(1, 3))
 par(oma = c(0, 0, 0, 0))
 par(mar = c(0, 0, 1, 0))
@@ -72,7 +73,7 @@ Regions1@data
 # слот "полигоны"
 str(Regions1@polygons)
 
-# картограмма Беларуси, на которой каждая область залита своим цветом
+# картограмма Беларуси, на которой каждая область залита своим цветом ..........
 # делаем фактор из имён областей (т.е. нумеруем их)
 Regions1@data$NAME_1 <- as.factor(Regions1@data$NAME_1)
 Regions1@data$NAME_1
@@ -96,7 +97,7 @@ spplot(Regions1, "NAME_1",
 # Административная карта Республики Беларусь, регионы раскрашены
 #  по значениям непрерывного числового показателя
 
-# загружаем статистику с показателями по регионам
+# загружаем статистику с показателями по регионам Беларуси за 2014 год
 fileURL <- 'https://raw.githubusercontent.com/aksyuk/R-data/master/STATE_STAT/BLR_Regions_2014.csv'
 stat.Regions <- read.csv2(fileURL, stringsAsFactors = F)
 stat.Regions
@@ -107,13 +108,13 @@ Regions1@data <- merge(Regions1@data, stat.Regions,
 # задаём палитру
 mypalette <- colorRampPalette(c('whitesmoke', 'coral3'))
 
-# строим картограмму численности населения
+# строим картограмму численности населения .....................................
 spplot(Regions1, 'Population.people',
        col.regions = mypalette(20),  # определение цветовой шкалы
        col = 'coral4',               # цвет контурных линий на карте
        par.settings = list(axis.line = list(col = NA))) # без осей
 
-# то же - с названиями областей
+# то же - с названиями областей ................................................
 spplot(Regions1, 'Population.people', 
        col.regions = mypalette(16), col = 'coral4', 
        main = 'Численность населения, человек',
@@ -136,10 +137,10 @@ Regions <- readOGR(dsn = './data/BLR_adm_shp',   # папка с файлами 
 
 # создаём столбец-ключ id для связи с другими таблицами
 #  (названия регионов из столбца NAME_1)
-
 Regions@data$id <- Regions@data$NAME_1
+
 # преобразовать SpatialPolygonsDataFrame в data.frame
-Regions.points <- tidy(Regions, region = 'id')
+Regions.points <- fortify(Regions, region = 'id')
 
 # добавить к координатам сведения о регионах
 Regions.df <- merge(Regions.points, Regions@data, by = 'id')
@@ -169,7 +170,7 @@ gp <- ggplot() +
                          direction = 1,
                          breaks = pretty_breaks(n = 5)) +
     labs(x = 'Долгота', y = 'Широта', 
-         title = "Численность населения, человек") +
+         title = "Численность населения в 2014, человек") +
     geom_text(data = centroids.df, 
                        aes(long, lat, label = id))
 # выводим график
