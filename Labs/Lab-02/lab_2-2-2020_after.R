@@ -175,7 +175,7 @@ DT.flights.sml[dest == 'DSM',
 # проверяем, на месте ли наши файлы со статистикой по импорту
 dir('./data')
 # имена файлов
-data.filename <- paste0('./data/comtrade_', 2010:2019, '.csv')
+data.filename <- paste0('./data/comtrade_', 2010:2020, '.csv')
 
 # # если нет, качаем по новой
 # # создаём директорию для данных, если она ещё не существует:
@@ -263,7 +263,7 @@ data.frame(names(na.num), na.num, col.remove,
            row.names = 1:length(na.num))
 
 # уберём эти столбцы из таблицы
-DT <- DT[, !col.remove, with = F]
+DT <- DT[, !col.remove]
 dim(DT)
 
 # смотрим статистику по столбцам

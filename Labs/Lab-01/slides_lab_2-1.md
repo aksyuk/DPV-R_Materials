@@ -40,7 +40,7 @@ font-family: 'Verdana'
 
 <!-- Нижний колонтитул -->
 <div class = "footer-left" style = "font-size: 70%; color: white; width:50%;">ГУУ, ИИС, кафедра ММЭУ</div>
-<div class = "footer-right" style = "font-size: 70%; color: white; width:50%;">весенний семестр 2019/2020</div>
+<div class = "footer-right" style = "font-size: 70%; color: white; width:50%;">весенний семестр 2020/2021</div>
 
 Темы практик
 ========================================================

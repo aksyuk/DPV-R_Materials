@@ -8,13 +8,17 @@
 
 # Загрузка пакетов
 library('XML')                 # разбор XML-файлов
+library('XML2')                # разбор XML-файлов
 library('RCurl')               # работа с HTML-страницами
 library('rjson')               # чтение формата JSON
 library('rvest')               # работа с DOM сайта
 library('dplyr')               # инструменты трансформирования данных
 
 
+
+
 # Часть 1: Загрузка данных -----------------------------------------------------
+
 
 
 # Загрузка файла .csv из сети ==================================================
@@ -57,6 +61,7 @@ tail(DF.import)    # последние несколько строк табли
 
 # справочник к данным
 # https://github.com/aksyuk/R-data/blob/master/COMTRADE/CodeBook_040510-Imp-RF-comtrade.md
+
 
 
 # Парсинг XML ==================================================================
@@ -117,16 +122,18 @@ dim(DF.food)     # размерность таблицы
 str(DF.food)     # структура (характеристики столбцов)
 
 
-# Пример 3: Обменные курсы белорусского рубля ##################################
+# Пример 3: Обменные курсы евро ################################################
 
-# обменный курс белорусского рубля по отношению к иностранным
-#  валютам, на последнюю дату установления 
-fileURL <- 'http://www.nbrb.by/Services/XmlExRates.aspx?period=1'
-# загружаем содержимое в объект doc
-doc <- xmlTreeParse(fileURL, useInternalNodes = T)
+# обменный курс евро по отношению к иностранным
+#  валютам, на текущую дату
+fileURL <- 'https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml'
+# xmlParse() не работает с https, поэтому сначала читаем страницу как текст
+xmlData <- getURL(fileURL)
+# и разбираем содержимое в объект doc
+parsedXML <- xmlParse(xmlData, useInternalNodes = T)
 
 # корневой элемент
-rootNode <- xmlRoot(doc)
+rootNode <- xmlRoot(parsedXML)
 # класс объекта rootNode
 class(rootNode)
 
@@ -145,27 +152,38 @@ length(tag)
 # смотрим названия
 tag
 
-# вытаскиваем все значения из тегов "CharCode"
-cur <- xpathSApply(rootNode, "//CharCode", xmlValue)
+# в документе есть теги с явно объявленным пространством имён (namespace) gesmes
+try.tag <- xpathSApply(rootNode, "//name", xmlValue)         # пусто
+try.tag
+try.tag <- xpathSApply(rootNode, "//gesmes:name", xmlValue)  # тег найден
+try.tag
 
-# считаем количество уникальных
-length(unique(cur))
+# посмотреть пространство имён xml-документа
+xmlNamespace(rootNode)
 
-# превращаем XML во фрем
-DF.BYB <- xmlToDataFrame(rootNode, stringsAsFactors = F)
+# а информация о курсах записана в тегах Cube без явного namespace
+#  поэтому используем функцию name() для поиска тега
+# source: https://stackoverflow.com/questions/45634155/parse-nested-xml-with-namespaces-in-r
+tag <- xpathSApply(rootNode, "//*[name()='Cube']", xmlGetAttr, 'currency')
+tag
+curr.names <- unlist(tag)
+
+# курсы обмена
+tag <- xpathSApply(rootNode, "//*[name()='Cube']", xmlGetAttr, 'rate')
+tag
+curr.rate <- unlist(tag)
+
+# дата (обращаемся только к тегу Cube, в котором есть атрибут time)
+tag <- xpathSApply(rootNode, "//*[name()='Cube'][@time]", xmlGetAttr, 'time')
+tag
+
+# превращаем XML во фрейм
+DF.EUR <- cbind(curr.names, curr.rate, tag)
+colnames(DF.EUR) <- c('Валюта', 'Курс к евро', 'Дата')
 # предварительный просмотр
-dim(DF.BYB)     # размерность таблицы
-str(DF.BYB)     # структура (характеристики столбцов)
+dim(DF.EUR)     # размерность таблицы
+str(DF.EUR)     # структура (характеристики столбцов)
 
-# извлекаем дату
-BYB.date <- xpathSApply(rootNode, "//*[@Date]", xmlAttrs)
-BYB.date
-
-# добавляем даты во фрейм
-DF.BYB$Date.chr <- rep(BYB.date, dim(DF.BYB)[1])
-
-# снова проверяем структуру фрейма
-str(DF.BYB)
 
 
 # Парсинг HTML =================================================================
@@ -216,6 +234,7 @@ str(DF.price)                  # структура
 
 # записываем в файл .csv
 write.csv(DF.price, file = './data/DF_price.csv', row.names = F)
+
 
 
 # Веб-скраппинг с пакетом "rvest" ==============================================
@@ -298,6 +317,7 @@ write(paste('Файл "DF_movies_short.csv" записан', Sys.time()),
       file = log.filename, append = T)
 
 
+
 # Загрузка данных с помощью API ================================================
 
 
@@ -341,7 +361,7 @@ file.name <- './data/comtrade_2010.csv'
 write.csv(s1$data, file.name, row.names = F)
 
 # загрузка данных в цикле
-for (i in 2011:2019) {
+for (i in 2011:2020) {
     # таймер для ограничения API: не более запроса в секунду
     Sys.sleep(5)
     s1 <- get.Comtrade(r = 'all', p = "643", 
