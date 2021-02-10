@@ -8,7 +8,6 @@
 
 # Загрузка пакетов
 library('XML')                 # разбор XML-файлов
-library('XML2')                # разбор XML-файлов
 library('RCurl')               # работа с HTML-страницами
 library('rjson')               # чтение формата JSON
 library('rvest')               # работа с DOM сайта
@@ -76,14 +75,14 @@ fileURL <- 'https://www.w3schools.com/xml/simple.xml'
 doc <- getURL(fileURL)
 
 # разбираем объект как XML
-doc <- xmlTreeParse(doc, useInternalNodes = T)
+parsedXML <- xmlTreeParse(doc, useInternalNodes = T)
 
 # просмотр загруженного документа
 # ВНИМАНИЕ: не повторять для больших страниц!
-doc
+parsedXML
 
 # корневой элемент XML-документа  
-rootNode <- xmlRoot(doc)  
+rootNode <- xmlRoot(parsedXML)  
 
 # имя корневого тега  
 xmlName(rootNode)  
@@ -128,15 +127,16 @@ str(DF.food)     # структура (характеристики столбц
 #  валютам, на текущую дату
 fileURL <- 'https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml'
 # xmlParse() не работает с https, поэтому сначала читаем страницу как текст
-xmlData <- getURL(fileURL)
+doc <- getURL(fileURL)
 # и разбираем содержимое в объект doc
-parsedXML <- xmlParse(xmlData, useInternalNodes = T)
+parsedXML <- xmlParse(doc, useInternalNodes = T)
 
 # корневой элемент
 rootNode <- xmlRoot(parsedXML)
 # класс объекта rootNode
 class(rootNode)
 
+# имя корневого элемента
 xmlName(rootNode)
 
 # вытаскиваем имена всех тегов документа (*)
@@ -189,51 +189,52 @@ str(DF.EUR)     # структура (характеристики столбц�
 # Парсинг HTML =================================================================
 
 
-# Пример 4: Выдача Яндекс Маркета ##############################################
+# Пример 4: Список книг с Википедии ############################################
 
-# URL страницы поиска в Яндекс Маркете: "Графические планшеты"
-fileURL <- "https://market.yandex.ru/catalog--graficheskie-planshety/55334/list?local-offers-first=0&onstock=1"
+# URL страницы топ-200 книг по версии BBC на Википедии
+fileURL <- "https://ru.wikipedia.org/wiki/200_%D0%BB%D1%83%D1%87%D1%88%D0%B8%D1%85_%D0%BA%D0%BD%D0%B8%D0%B3_%D0%BF%D0%BE_%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D0%B8_%D0%91%D0%B8-%D0%B1%D0%B8-%D1%81%D0%B8"
 
-# загружаем текст html-страницы
-html <- getURL(fileURL)
+# загружаем текст html-страницы, явно указывая кодировку (помогает от проблем с кириллицей)
+html <- getURL(fileURL, .encoding = 'UTF-8')
 
 # разбираем как html
-doc <- htmlParse(html)
+parsedHTML <- htmlParse(html)
 
 # корневой элемент
-rootNode <- xmlRoot(doc)
+rootNode <- xmlRoot(parsedHTML)
 
-# выбираем все наименования моделей
-m <- xpathSApply(rootNode, '//h3[@class="n-snippet-card2__title"]/a', 
-                 xmlValue)
+# выбираем все наименования книг
+wiki.title <- xpathSApply(rootNode, '//span[text()="Список"]/parent::h2/following-sibling::div//li/a[1]',
+                          xmlGetAttr, 'title')
 # просмотр первых трёх элементов вектора
-m[1:3]
+wiki.title[1:3]
 
-# выбираем все цены
-p <- xpathSApply(rootNode, '//div[@class="price"]', xmlValue)
+# выбираем всех авторов книг
+wiki.author <- xpathSApply(rootNode, '//span[text()="Список"]/parent::h2/following-sibling::div//li/a[2]',
+                           xmlGetAttr, 'title')
 # просмотр первых трёх элементов вектора
-p[1:3]
-# удаляем все нечисловые символы
-p <- as.numeric(gsub('[^0-9\\.]', '', p))
+wiki.author[1:3]
 
-# Проблема с размерностью:
-length(m)
-length(p)
+# выбираем всех ссылок на книги
+wiki.link <- xpathSApply(rootNode, '//span[text()="Список"]/parent::h2/following-sibling::div//li/a[1]',
+                         xmlGetAttr, 'href')
+# просмотр первых трёх элементов вектора
+wiki.link[1:3]
 
-# отбираем названия моделей, предшествующие найденным тегам цен
-m <- xpathSApply(rootNode, '//div[@class="price"]/ancestor::div//h3/a', 
-                 xmlValue)
-length(m)
+# выделяем те книги, у которых нет страниц на Википедии. Ссылки при этом есть, но их класс 'new'
+wiki.no.page <- xpathSApply(rootNode,
+                            '//span[text()="Список"]/parent::h2/following-sibling::div//li/a[1][@class="new"]',
+                            xmlGetAttr, 'title')
+# просмотр первых трёх элементов вектора
+wiki.no.page[1:3]
+
+# делаем ссылки на страницу-заглкушку "такой страницы на Википедии нет" пропусками
+wiki.link[wiki.title %in% wiki.no.page] <- NA
 
 # объединяем во фрейм
-DF.price <- data.frame(Model = m, Price = p, stringsAsFactors = F)
-
-# просмотр результата
-dim(DF.price)                  # размерность
-str(DF.price)                  # структура
-
+DF.wiki <- data.frame(Книга = wiki.title, Автор = wiki.author, Ссылка = wiki.link)
 # записываем в файл .csv
-write.csv(DF.price, file = './data/DF_price.csv', row.names = F)
+write.csv(DF.wiki, file = './data/DF_wiki.csv', row.names = F)
 
 
 
@@ -243,13 +244,13 @@ write.csv(DF.price, file = './data/DF_price.csv', row.names = F)
 # Пример 5: рейтинг фильмов IMDB ###############################################
 
 # URL страницы для скраппинга
-url <- 'http://www.imdb.com/search/title?count=100&release_date=2016,2016&title_type=feature'
+fileURL <- 'https://www.imdb.com/search/title/?title_type=feature&release_date=2016-01-01,2016-12-31'
 
 # читаем HTML страницы
-webpage <- read_html(url)
+doc <- read_html(fileURL)
 
 # скраппим страницу по селектору и преобразуем в текст
-rank_data <- webpage %>% html_nodes('.text-primary') %>% html_text
+rank_data <- doc %>% html_nodes('.text-primary') %>% html_text
 
 length(rank_data)      # размер вектора
 head(rank_data)        # первые шесть рангов
@@ -258,28 +259,28 @@ rank_data <- as.numeric(rank_data)
 head(rank_data)
 
 # отбор названий фильмов по селектору
-title_data <- webpage %>% html_nodes('.lister-item-header a') %>% html_text
+title_data <- doc %>% html_nodes('.lister-item-header a') %>% html_text
 length(title_data)
 head(title_data)
 
 # описания фильмов
-description_data <- webpage %>% html_nodes('.ratings-bar+ .text-muted') %>% 
+description_data <- doc %>% html_nodes('.ratings-bar+ .text-muted') %>% 
   html_text()
 length(description_data)
 head(description_data)
 
 # длительности фильмов
-runtime_data <- webpage %>% html_nodes('.text-muted .runtime') %>% html_text
+runtime_data <- doc %>% html_nodes('.text-muted .runtime') %>% html_text
 length(runtime_data)
 head(runtime_data)
 
 # жанры фильмов 
-genre_data <- webpage %>% html_nodes('.genre') %>% html_text
+genre_data <- doc %>% html_nodes('.genre') %>% html_text
 length(genre_data)
 head(genre_data)
 
 # селектор для общего рейтинга (метарейтинга) 
-metascore_data <- webpage %>% html_nodes('.ratings-metascore') %>% html_text
+metascore_data <- doc %>% html_nodes('.ratings-metascore') %>% html_text
 # предварительный результат
 length(metascore_data)
 
@@ -294,7 +295,7 @@ get_tags <- function(node){
 # это глобальная переменная будет неявно передана функции get_tags()
 selector <- '.ratings-metascore'
 # находим все ноды (теги) верхнего уровня, с информацией о каждом фильме
-doc <- html_nodes(webpage, '.lister-item-content')
+doc <- html_nodes(doc, '.lister-item-content')
 # применяем к этим тегам поиск метарейтинга и ставим NA там, где тега нет
 metascore_data <- sapply(doc, get_tags)
 # предварительный результат
