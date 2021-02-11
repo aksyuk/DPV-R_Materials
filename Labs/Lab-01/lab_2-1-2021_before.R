@@ -195,35 +195,65 @@ str(DF.EUR)     # структура (характеристики столбц�
 fileURL <- "https://ru.wikipedia.org/wiki/200_%D0%BB%D1%83%D1%87%D1%88%D0%B8%D1%85_%D0%BA%D0%BD%D0%B8%D0%B3_%D0%BF%D0%BE_%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D0%B8_%D0%91%D0%B8-%D0%B1%D0%B8-%D1%81%D0%B8"
 
 # загружаем текст html-страницы, явно указывая кодировку (помогает от проблем с кириллицей)
-html <- getURL(fileURL, .encoding = 'UTF-8')
+# html <- getURL(fileURL, .encoding = 'UTF-8')  # работает под Linux
+html <- GET(fileURL)     # работает под Windows
+
+# класс объекта с загруженным содержимым
+class(html)
+class(content(html))     # только для функции GET()
 
 # разбираем как html
-parsedHTML <- htmlParse(html)
+# parsedHTML <- htmlParse(html)       # для getURL()
+parsedHTML <- htmlParse(httr::content(html, as = 'text'),
+                        useInternalNodes = T)             # для GET()
 
 # корневой элемент
 rootNode <- xmlRoot(parsedHTML)
 
 # выбираем все наименования книг
 wiki.title <- 
+
+# проверяем длину
+length(wiki.title)
+  
 # просмотр первых трёх элементов вектора
+wiki.title[1:3]
+
+# исправляем кодировку
+Encoding(wiki.title) <- 
 wiki.title[1:3]
 
 # выбираем всех авторов книг
 wiki.author <- 
-# просмотр первых трёх элементов вектора
+  
+# проверяем длину
+length(wiki.author)
+
+# исправляем кодировку
+Encoding(wiki.author) <- 'UTF-8'
 wiki.author[1:3]
 
-# выбираем всех ссылок на книги
+# выбираем все ссылки на книги
 wiki.link <- 
+  
+# проверяем длину
+length(wiki.link)
 # просмотр первых трёх элементов вектора
 wiki.link[1:3]
 
 # выделяем те книги, у которых нет страниц на Википедии. Ссылки при этом есть, но их класс 'new'
 wiki.no.page <- 
-# просмотр первых трёх элементов вектора
-wiki.no.page[1:3]
+  
+  
+# исправляем кодировку
+Encoding(wiki.no.page) <- 'UTF-8'
+wiki.no.page[1:3]  
 
-# делаем ссылки на страницу-заглкушку "такой страницы на Википедии нет" пропусками
+# делаем ссылки на страницу-заглушку "такой страницы на Википедии нет" пропусками
+
+
+# добавляем адрес сайта во внутренние ссылки
+
 
 
 # объединяем во фрейм
@@ -239,7 +269,7 @@ write.csv(DF.wiki, file = './data/DF_wiki.csv', row.names = F)
 # Пример 5: рейтинг фильмов IMDB ###############################################
 
 # URL страницы для скраппинга
-url <- 'http://www.imdb.com/search/title?count=100&release_date=2016,2016&title_type=feature'
+fileURL <- 'http://www.imdb.com/search/title?count=100&release_date=2016,2016&title_type=feature'
 
 # читаем HTML страницы
 doc <- 
@@ -254,28 +284,28 @@ rank_data <-
 head(rank_data)
 
 # отбор названий фильмов по селектору
-title_data <- webpage %>% html_nodes('.lister-item-header a') %>% html_text
+title_data <- doc %>% html_nodes('.lister-item-header a') %>% html_text
 length(title_data)
 head(title_data)
 
 # описания фильмов
-description_data <- webpage %>% html_nodes('.ratings-bar+ .text-muted') %>% 
+description_data <- doc %>% html_nodes('.ratings-bar+ .text-muted') %>% 
   html_text()
 length(description_data)
 head(description_data)
 
 # длительности фильмов
-runtime_data <- webpage %>% html_nodes('.text-muted .runtime') %>% html_text
+runtime_data <- doc %>% html_nodes('.text-muted .runtime') %>% html_text
 length(runtime_data)
 head(runtime_data)
 
 # жанры фильмов 
-genre_data <- webpage %>% html_nodes('.genre') %>% html_text
+genre_data <- doc %>% html_nodes('.genre') %>% html_text
 length(genre_data)
 head(genre_data)
 
 # селектор для общего рейтинга (метарейтинга) 
-metascore_data <- webpage %>% html_nodes('.ratings-metascore') %>% html_text
+metascore_data <- doc %>% html_nodes('.ratings-metascore') %>% html_text
 # Проблема с длиной вектора!
 length(metascore_data)
 
@@ -290,7 +320,7 @@ get_tags <- function(node){
 # это глобальная переменная будет неявно передана функции get_tags()
 selector <- '.ratings-metascore'
 # находим все ноды (теги) верхнего уровня, с информацией о каждом фильме
-doc <- html_nodes(webpage, '.lister-item-content')
+doc <- html_nodes(doc, '.lister-item-content')
 # применяем к этим тегам поиск метарейтинга и ставим NA там, где тега нет
 metascore_data <- sapply(doc, get_tags)
 # предварительный результат

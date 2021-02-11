@@ -9,6 +9,7 @@
 # Загрузка пакетов
 library('XML')                 # разбор XML-файлов
 library('RCurl')               # работа с HTML-страницами
+library('httr')                # работа с HTML-страницами -- надёжнее, чем RCurl
 library('rjson')               # чтение формата JSON
 library('rvest')               # работа с DOM сайта
 library('dplyr')               # инструменты трансформирования данных
@@ -195,46 +196,74 @@ str(DF.EUR)     # структура (характеристики столбц�
 fileURL <- "https://ru.wikipedia.org/wiki/200_%D0%BB%D1%83%D1%87%D1%88%D0%B8%D1%85_%D0%BA%D0%BD%D0%B8%D0%B3_%D0%BF%D0%BE_%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D0%B8_%D0%91%D0%B8-%D0%B1%D0%B8-%D1%81%D0%B8"
 
 # загружаем текст html-страницы, явно указывая кодировку (помогает от проблем с кириллицей)
-html <- getURL(fileURL, .encoding = 'UTF-8')
+# html <- getURL(fileURL, .encoding = 'UTF-8')  # работает под Linux
+html <- GET(fileURL)     # работает под Windows
+
+# класс объекта с загруженным содержимым
+class(html)
+class(content(html))     # только для функции GET()
 
 # разбираем как html
-parsedHTML <- htmlParse(html)
+# parsedHTML <- htmlParse(html)       # для getURL()
+parsedHTML <- htmlParse(httr::content(html, as = 'text'),
+                        useInternalNodes = T)             # для GET()
 
 # корневой элемент
 rootNode <- xmlRoot(parsedHTML)
 
 # выбираем все наименования книг
-wiki.title <- xpathSApply(rootNode, '//span[text()="Список"]/parent::h2/following-sibling::div//li/a[1]',
+wiki.title <- xpathSApply(rootNode, '//span[@class="mw-headline"][1]/parent::h2/following-sibling::div//li/a[1]',
                           xmlGetAttr, 'title')
+# проверяем длину
+length(wiki.title)
+
 # просмотр первых трёх элементов вектора
 wiki.title[1:3]
 
+# исправляем кодировку
+Encoding(wiki.title) <- 'UTF-8'
+wiki.title[1:3]
+
 # выбираем всех авторов книг
-wiki.author <- xpathSApply(rootNode, '//span[text()="Список"]/parent::h2/following-sibling::div//li/a[2]',
+wiki.author <- xpathSApply(rootNode, '//span[@class="mw-headline"][1]/parent::h2/following-sibling::div//li/a[2]',
                            xmlGetAttr, 'title')
-# просмотр первых трёх элементов вектора
+# проверяем длину
+length(wiki.author)
+
+# исправляем кодировку
+Encoding(wiki.author) <- 'UTF-8'
 wiki.author[1:3]
 
-# выбираем всех ссылок на книги
-wiki.link <- xpathSApply(rootNode, '//span[text()="Список"]/parent::h2/following-sibling::div//li/a[1]',
+# выбираем все ссылки на книги
+wiki.link <- xpathSApply(rootNode, '//span[@class="mw-headline"][1]/parent::h2/following-sibling::div//li/a[1]',
                          xmlGetAttr, 'href')
+# проверяем длину
+length(wiki.link)
 # просмотр первых трёх элементов вектора
 wiki.link[1:3]
 
 # выделяем те книги, у которых нет страниц на Википедии. Ссылки при этом есть, но их класс 'new'
 wiki.no.page <- xpathSApply(rootNode,
-                            '//span[text()="Список"]/parent::h2/following-sibling::div//li/a[1][@class="new"]',
+                            '//span[@class="mw-headline"][1]/parent::h2/following-sibling::div//li/a[1][@class="new"]',
                             xmlGetAttr, 'title')
-# просмотр первых трёх элементов вектора
+# исправляем кодировку
+Encoding(wiki.no.page) <- 'UTF-8'
 wiki.no.page[1:3]
 
-# делаем ссылки на страницу-заглкушку "такой страницы на Википедии нет" пропусками
+# делаем ссылки на страницу-заглушку "такой страницы на Википедии нет" пропусками
 wiki.link[wiki.title %in% wiki.no.page] <- NA
+
+# добавляем адрес сайта во внутренние ссылки
+wiki.link[!is.na(wiki.link)] <- paste0('https://ru.wikipedia.org', 
+                                       wiki.link[!is.na(wiki.link)])
 
 # объединяем во фрейм
 DF.wiki <- data.frame(Книга = wiki.title, Автор = wiki.author, Ссылка = wiki.link)
 # записываем в файл .csv
 write.csv(DF.wiki, file = './data/DF_wiki.csv', row.names = F)
+# сделать запись в лог
+write(paste('Файл "DF_wiki.csv" записан', Sys.time()), 
+      file = log.filename, append = T)
 
 
 
@@ -247,7 +276,7 @@ write.csv(DF.wiki, file = './data/DF_wiki.csv', row.names = F)
 fileURL <- 'https://www.imdb.com/search/title/?title_type=feature&release_date=2016-01-01,2016-12-31'
 
 # читаем HTML страницы
-doc <- read_html(fileURL)
+doc <- read_html(fileURL, encoding = 'UTF-8')
 
 # скраппим страницу по селектору и преобразуем в текст
 rank_data <- doc %>% html_nodes('.text-primary') %>% html_text
