@@ -200,12 +200,14 @@ html <- GET(fileURL)     # работает под Windows
 
 # класс объекта с загруженным содержимым
 class(html)
-class(content(html))     # только для функции GET()
+
+# дальше только для функции GET()
+html <- 
+class(html)
 
 # разбираем как html
-# parsedHTML <- htmlParse(html)       # для getURL()
-parsedHTML <- htmlParse(httr::content(html, as = 'text'),
-                        useInternalNodes = T)             # для GET()
+# parsedHTML <- htmlParse(html)                      # для getURL()
+parsedHTML <- htmlParse(html, useInternalNodes = T)  # для GET()
 
 # корневой элемент
 rootNode <- xmlRoot(parsedHTML)
