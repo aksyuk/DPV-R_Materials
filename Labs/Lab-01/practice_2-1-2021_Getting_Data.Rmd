@@ -11,15 +11,13 @@ output:
 
 Ключевые слова: R[^1], r-project, RStudio  
 
-Версия 2.0.1 (2020)  
-
 Примеры выполнены R версии `r paste0(R.version$major, '.', R.version$minor)`, «`r R.version$nickname`».  
 
-Версия RStudio: 1.2.1335.  
+Версия RStudio: 1.4.1103.  
 
-Все ссылки действительны на 3 февраля 2020 г.  
+Все ссылки действительны на 8 февраля 2021 г.  
 
-Файл с макетом кода для этой практики: [lab_2-1_before.R](https://github.com/aksyuk/DPV-R_Materials/blob/master/Labs/Lab-01/lab_2-1-2020_before.R)  
+Файл с макетом кода для этой практики: [lab_2-1_before.R](https://github.com/aksyuk/DPV-R_Materials/blob/master/Labs/Lab-01/lab_2-1-2021_before.R)  
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(

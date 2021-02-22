@@ -11,15 +11,13 @@ output:
 
 Ключевые слова: R[^1], r-project, RStudio  
 
-Версия 2.0.1 (2020)  
-
 Примеры выполнены R версии `r paste0(R.version$major, '.', R.version$minor)`, "`r R.version$nickname`".  
 
-Версия RStudio: 1.2.1335.  
+Версия RStudio: 1.4.1103.  
 
-Все ссылки действительны на 4 февраля 2020 г.  
+Все ссылки действительны на 22 февраля 2021 г.  
 
-Файл с макетом кода для этой практики: [lab_2-2_before.R](https://github.com/aksyuk/DPV-R_Materials/blob/master/Labs/Lab-02/lab_2-2-2019_before.R)  
+Файл с макетом кода для этой практики: [lab_2-2_before.R](https://github.com/aksyuk/DPV-R_Materials/blob/master/Labs/Lab-02/lab_2-2-2020_before.R)  
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -468,7 +466,7 @@ DT.flights.sml[dest == 'DSM',
 
 ```{r paragraph-03-chunk-01}
 # читаем в data.table
-DF.movies.short <- data.table(read.csv('./data/DF_movies_short.csv',
+DF.movies <- data.table(read.csv('./data/DF_movies_short.csv',
                                        stringsAsFactors = F, 
                                        fileEncoding = 'cp1251'))
 
@@ -477,13 +475,14 @@ DF.movies.short <- data.table(read.csv('./data/DF_movies_short.csv',
 # # 
 # # если файла в директории с данными нет, качаем с github
 # file.URL <- 'https://raw.githubusercontent.com/aksyuk/DPV-R_Materials/master/Labs/Lab-01/data/DF_movies_short.csv'
-# DT.news <- data.table(read.csv(file.URL, stringsAsFactors = F, 
-#                                fileEncoding = 'cp1251'))
+# DF.movies <- data.table(read.csv(file.URL,
+#                         stringsAsFactors = F, 
+#                         fileEncoding = 'cp1251'))
 # # !!! ........................................................................
 
 # результат
-str(DF.movies.short)
-head(DF.movies.short)
+str(DF.movies)
+head(DF.movies)
 
 ```
 
@@ -501,17 +500,17 @@ head(DF.movies.short)
 
 * `gsub(<`*что_ищем*`>', <`*на_что_заменяем*`>', <`*где_ищем*`>')` -- то же, что и `sub()`, но ищет и заменяет все вхождения подстроки в исходной строке [^10].   
 
-\ \ \ \ \ Проверим работу этих функций на таблице `DT.news`.   
+\ \ \ \ \ Проверим работу этих функций на таблице `DF.movies`.   
 
 ```{r paragraph-03-chunk-02}
 # номера фильмов, в жанрах которых встречается слово "Action"
-grep('Action', DF.movies.short$Genre)
+grep('Action', DF.movies$Genre)
 
 # значения этих жанров
-grep('Action', DF.movies.short$Genre, value = T)
+grep('Action', DF.movies$Genre, value = T)
 
 # количество фильмов со словом "Action" и без него
-table(grepl('Action', DF.movies.short$Genre))
+table(grepl('Action', DF.movies$Genre))
 
 ```
 
@@ -519,11 +518,11 @@ table(grepl('Action', DF.movies.short$Genre))
 
 ```{r paragraph-03-chunk-03}
 # поиск с регулярным выражением
-act.or.drama <- grepl('[Action]|[Drama]', DF.movies.short$Genre)
+act.or.drama <- grepl('[Action]|[Drama]', DF.movies$Genre)
 table(act.or.drama)
 
 # пусто!
-DF.movies.short[!act.or.drama, ]
+DF.movies[!act.or.drama, ]
 
 ```
 
@@ -531,10 +530,10 @@ DF.movies.short[!act.or.drama, ]
 
 ```{r paragraph-03-chunk-04}
 # пробелы в конце строки
-length(grep(' $', DF.movies.short$Genre, value = T))
+length(grep(' $', DF.movies$Genre, value = T))
 
 # названия фильмоа, в которых присутствуют цифры
-grep('\\d+', DF.movies.short$Title, value = T)
+grep('\\d+', DF.movies$Title, value = T)
 
 ```
 
@@ -555,11 +554,11 @@ grep('\\d+', DF.movies.short$Title, value = T)
 
 ```{r paragraph-03-chunk-05}
 # найти и убрать хвостовые пробелы в жанрах
-DF.movies.short$Genre <- gsub(' *$', '', DF.movies.short$Genre)
+DF.movies$Genre <- gsub(' *$', '', DF.movies$Genre)
 # найти и убрать перевод строки в начале строки
-DF.movies.short$Genre <- gsub('^\\n', '', DF.movies.short$Genre)
+DF.movies$Genre <- gsub('^\\n', '', DF.movies$Genre)
 
-head(DF.movies.short$Genre)
+head(DF.movies$Genre)
 
 ```
 
@@ -567,46 +566,46 @@ head(DF.movies.short$Genre)
 
 ```{r paragraph-03-chunk-06}
 # оставляем только первый жанр для каждого фильма
-DF.movies.short$Genre <- gsub(',.*', '', DF.movies.short$Genre)
-head(DF.movies.short$Genre)
+DF.movies$Genre <- gsub(',.*', '', DF.movies$Genre)
+head(DF.movies$Genre)
 
 ```
 
 \ \ \ \ \ Пройдёмся по остальным столбцам таблицы. В описаниях фильмов есть символы перевода строки и начальные пробелы.      
 
 ```{r paragraph-03-chunk-07}
-head(DF.movies.short$Description)
+head(DF.movies$Description)
 
 # убираем символы перевода строк из описаний
-DF.movies.short$Description <- gsub('\\n', '', DF.movies.short$Description)
+DF.movies$Description <- gsub('\\n', '', DF.movies$Description)
 # убираем пробелы из начала описаний
-DF.movies.short$Description <- gsub('^ *', '', DF.movies.short$Description)
+DF.movies$Description <- gsub('^ *', '', DF.movies$Description)
 
-head(DF.movies.short$Description)
+head(DF.movies$Description)
 
 ```
 
 \ \ \ \ \ Из столбца с длительностью фильма (в минутах) убираем единицы измерения.         
 
 ```{r paragraph-03-chunk-08}
-head(DF.movies.short$Runtime)
+head(DF.movies$Runtime)
 
 # убираем " min" из столбца с длительностью фильма
-DF.movies.short$Runtime <- as.numeric(gsub(' min', '', DF.movies.short$Runtime))
+DF.movies$Runtime <- as.numeric(gsub(' min', '', DF.movies$Runtime))
 
-head(DF.movies.short$Runtime)
+head(DF.movies$Runtime)
 
 ```
 
 \ \ \ \ \ Наконец, убираем все нечисловые символы из столбца с метарейтингом.         
 ```{r paragraph-03-chunk-09}
-head(DF.movies.short$Metascore)
+head(DF.movies$Metascore)
 
 # убираем все нечисловые символы
-DF.movies.short$Metascore <- as.numeric(gsub('[^0-9\\.]', '', 
-                                             DF.movies.short$Metascore))
+DF.movies$Metascore <- as.numeric(gsub('[^0-9\\.]', '', 
+                                             DF.movies$Metascore))
 
-head(DF.movies.short$Metascore)
+head(DF.movies$Metascore)
 
 ```
 
@@ -629,7 +628,7 @@ head(DF.movies.short$Metascore)
 # проверяем, на месте ли наши файлы со статистикой по импорту
 dir('./data')
 # имена файлов
-data.filename <- paste0('./data/comtrade_', 2010:2019, '.csv')
+data.filename <- paste0('./data/comtrade_', 2010:2020, '.csv')
 
 # # !!! ........................................................................
 # # чтобы снять комментарии с кода, выделите его и нажмите Shift + Ctrl + C
@@ -645,7 +644,7 @@ data.filename <- paste0('./data/comtrade_', 2010:2019, '.csv')
 # #  и делаем запись о загрузке в лог:
 # file.URL <- paste0('https://raw.githubusercontent.com/aksyuk/',
 #                    'R-data/master/COMTRADE/comtrade_',
-#                    2010:2019, '.csv')
+#                    2010:2020, '.csv')
 # for (i in 1:length(data.filename)) {
 #     if (!file.exists(data.filename[i])) {
 #         download.file(file.URL[i], data.filename[i])
