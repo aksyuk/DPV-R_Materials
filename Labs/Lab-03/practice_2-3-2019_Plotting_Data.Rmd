@@ -5,22 +5,19 @@ date: "`r format(Sys.time(), '%d %b, %Y')`"
 tags: "R[^1], r-project, RStudio"  
 output:
   word_document:
-    pandoc_args: ["-smart"]
     reference_docx: ../Шаблон.docx
     toc: yes
 ---
 
 Ключевые слова: R[^1], r-project, RStudio  
 
-Версия 2.0.0 (2019)  
-
 Примеры выполнены R версии `r paste0(R.version$major, '.', R.version$minor)`, "`r R.version$nickname`".  
 
-Версия RStudio: 1.1.453.  
+Версия RStudio: 1.4.1103.  
 
-Все ссылки действительны на 26 февраля 2019 г.  
+Все ссылки действительны на 02 марта 2021 г.  
 
-Файл с макетом кода для этой практики: [lab_2-3-2019_before.R](https://sites.google.com/a/kiber-guu.ru/r-practice/dpv/lab_2-3-2019_before.R?attredirects=0&d=1)  
+Файл с макетом кода для этой практики: [lab_2-3-2021_before.R](https://sites.google.com/a/kiber-guu.ru/r-practice/dpv/lab_2-3-2021_before.R?attredirects=0&d=1)  
 
 ```{r setup, include = F}
 knitr::opts_chunk$set(
@@ -1402,7 +1399,7 @@ dev.off()
 
 [^11]: Блог Р.Кабакова Quick-R: Histograms and Density Plots. URL: <http://www.statmethods.net/graphs/density.html>   
 
-[^12]: Аксюк С.А. Введение в язык R. Графики. URL: https://sites.google.com/a/kiber-guu.ru/r-practice/pract/Practice_02.pdf?attredirects=0&d=1   
+[^12]: Суязова С.А. Введение в язык статистической обработки данных R. URL: [https://github.com/aksyuk/R-Practice-basics/blob/master/RScripts/manual_basics/Суязова С.А._Введение в R_2018_pdf_title.pdf](https://github.com/aksyuk/R-Practice-basics/blob/master/RScripts/manual_basics/%D0%A1%D1%83%D1%8F%D0%B7%D0%BE%D0%B2%D0%B0%20%D0%A1.%D0%90._%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%B2%20R_2018_pdf_title.pdf)   
 
 [^13]: С.Э. Мастицкий, В.К. Шитиков Статистический анализ и визуализация данных с помощью R. URL: <https://sites.google.com/a/kiber-guu.ru/r-practice/links/Mastitsky_and_Shitikov_2014_R_tutorials.pdf?attredirects=0&d=1>   
 
