@@ -373,16 +373,15 @@ dev.off()
 
 # скошенность и эксцесс для переменных в целом
 # ненормальность распределений закономерно усиливается
-df.stats <- 
-    data.frame(var = c('Netweight.kg', 'Netweight.kg.median', 
-                       'Netweight.kg.mean'),
-               skew = round(c(skewness(na.omit(DT.import$Netweight.kg)), 
-                              skewness(DT.import$Netweight.kg.median),
-                              skewness(DT.import$Netweight.kg.mean)), 2),
-               kurt = round(c(kurtosis(na.omit(DT.import$Netweight.kg)), 
-                              kurtosis(DT.import$Netweight.kg.median),
-                              kurtosis(DT.import$Netweight.kg.mean)), 2),
-               stringsAsFactors = F)
+df.stats <- data.frame(var = c('Netweight.kg', 'Netweight.kg.median', 
+                               'Netweight.kg.mean'),
+                       skew = round(c(skewness(na.omit(DT.import$Netweight.kg)), 
+                                      skewness(DT.import$Netweight.kg.median),
+                                      skewness(DT.import$Netweight.kg.mean)), 2),
+                       kurt = round(c(kurtosis(na.omit(DT.import$Netweight.kg)), 
+                                      kurtosis(DT.import$Netweight.kg.median),
+                                      kurtosis(DT.import$Netweight.kg.mean)), 2),
+                       stringsAsFactors = F)
 df.stats
 
 
@@ -392,9 +391,9 @@ df.stats
 # Пример 4.2 ###################################################################
 
 # переменные: масса поставки и её стоимость
+DT.import[DT.import$Netweight.kg == 0, Netweight.kg := NA]
 x <- 
 y <- 
-y[y == 0] <- NA
 
 # оценка регрессии с помощью МНК
 fit <- 
@@ -473,6 +472,17 @@ points(x = log(NAs),
        y = rep(0, length(NAs)), 
        col = 'red', pch = '|')
 
+# добавим линии медианы и среднего
+abline(, 
+       lty = 2, col = 'brown')
+abline(, 
+       lty = 3, col = 'brown')
+
+# легенда
+legend('topleft', col = c('blue', 'brown', 'brown'), lty = c(1, 2, 3),
+       lwd = c(2, 1, 1), 
+       legend = c('log(y) ~ log(x)', 'log(mean)', 'log(median)'))
+
 # новый столбец, в котором будут заполнены пропуски
 DT.import[, Netweight.kg.model := Netweight.kg]
 # прогноз по модели на логарифмах сохраняем как вектор
@@ -480,7 +490,7 @@ y.model.log <- predict(fit.log, newdata = data.frame(x = NAs))
 # наносим прогнозы на график
 points(log(NAs), 
        y.model.log, 
-       pch = '+', cex = 2)
+       pch = '+', cex = 2, col = 'magenta')
 # пересчитываем в исходные единицы измерения y
 y.model <- 
 # заполняем пропуски модельными значениями

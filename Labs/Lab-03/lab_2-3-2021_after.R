@@ -363,7 +363,7 @@ DT.import[is.na(Netweight.kg), Year, Netweight.kg.mean]
 
 # смотрим, что изменилось
 png('Pic-03.png', width = 500, height = 500)
-densityplot(~ Netweight.kg.mean | as.factor(Year), 
+densityplot( ~ Netweight.kg.mean | as.factor(Year), 
             data = DT.import,
             ylim = c(-0.5e-05, 8.5e-05),
             main = 'Распределение массы поставки по годам, Netweight.kg.mean',
@@ -471,6 +471,17 @@ mtext(paste('Прямая линейная взаимосвязь, R^2=',
 points(x = log(NAs), 
        y = rep(0, length(NAs)), 
        col = 'red', pch = '|')
+
+# добавим линии медианы и среднего
+abline(h = log(mean(y, na.rm = T)), 
+       lty = 2, col = 'brown')
+abline(h = log(median(y, na.rm = T)), 
+       lty = 3, col = 'brown')
+
+# легенда
+legend('topleft', col = c('blue', 'brown', 'brown'), lty = c(1, 2, 3),
+       lwd = c(2, 1, 1), 
+       legend = c('log(y) ~ log(x)', 'log(mean)', 'log(median)'))
 
 # новый столбец, в котором будут заполнены пропуски
 DT.import[, Netweight.kg.model := Netweight.kg]
