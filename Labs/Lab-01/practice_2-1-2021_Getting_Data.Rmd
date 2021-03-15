@@ -817,19 +817,17 @@ for (i in 2011:2019) {
 
 1. Яндекс.Маркет, роботы-пылесосы (Москва).  
 
-1. Ozon.ru, детские книги (<https://www.ozon.ru/category/detyam-i-roditelyam-40025/>).    
+1. Лабиринт, детские книги (<https://www.labirint.ru/genres/1850/>).    
 
-1. Ozon.ru, художественные книги (<https://www.ozon.ru/category/hudozhestvennaya-literatura-16501/>).    
+1. Лабиринт, художественные книги (<https://www.labirint.ru/genres/1852/>).    
 
-1. Ozon.ru, нехудожественные книги (<https://www.ozon.ru/category/nehudozhestvennaya-literatura-16511/>).   
+1. Лабиринт, нехудожественные книги (<https://www.labirint.ru/genres/3000/>).   
+1. Лабиринт, иностранные книги (<https://www.labirint.ru/genres/965/>).   
 
-1. Ozon.ru, иностранные книги (<https://www.ozon.ru/category/literatura-na-inostrannyh-yazykah-40102/>).   
+1. Лабиринт, комиксы, манга, артбуки (<https://www.labirint.ru/genres/2993/>).   
+1. Лабиринт, учебники (<https://www.labirint.ru/genres/11/>).   
 
-1. Ozon.ru, книжные новинки (<https://www.ozon.ru/highlight/38672/>).   
-
-1. Ozon.ru, учебники (<https://www.ozon.ru/category/uchebnaya-literatura-40026/>).   
-
-1. Ozon.ru, топ-100 в жанре фантастики <https://www.ozon.ru/highlight/55499/>.      
+1. Лабиринт, фантастика <https://www.labirint.ru/genres/2791/>.      
 
 
 
