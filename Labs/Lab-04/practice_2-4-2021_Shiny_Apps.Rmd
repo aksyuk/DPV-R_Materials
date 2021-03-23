@@ -5,7 +5,6 @@ date: "`r format(Sys.time(), '%d %b, %Y')`"
 tags: "R[^1], r-project, RStudio"  
 output:
   word_document:
-    pandoc_args: ["-smart"]
     reference_docx: ../Шаблон.docx
     toc: yes
 ---
@@ -33,8 +32,8 @@ output:
 knitr::opts_chunk$set(
     echo = T,
     comment = "#>",
-    collapse = T,
-    fig.align = 'center'
+    collapse = T
+    # fig.align = 'center',
     # fig.height = 4,
     # fig.width = 4
 )
@@ -609,7 +608,7 @@ filter(select(DT.import, Period, Reporter, Trade.Value.USD),
 
 1. Затем функцией mutate() создадим новую переменную    `Trade.Value.USD.by.country`, в которую запишем суммарную стоимость поставок из каждой страны.   
 
-1. Все вышеперечисленные функции соединим последовательно каналом `%>%` [^7].   
+1. Все вышеперечисленные функции соединим последовательно каналом `%>%`.   
 
 \ \ \ \ \ Код, реализующий описанную выше последовательность операций, выглядит следующим образом:   
 
@@ -700,10 +699,8 @@ head(DT.import, n = 3)
 
 [^3]: Знакомьтесь -- Shiny, пакет для создания интерактивных веб-приложений на основе R / Блог С.Мастицкого «R: Анализ и визуализация данных». URL: <http://r-analytics.blogspot.ru/2012/11/shiny-r.html>   
 
-[^4]: Teach yourself Shiny / Руководство по «shiny» на <http://rstudio.com>. URL: <http://shiny.rstudio.com/tutorial/>   
+[^4]: Teach yourself Shiny / Руководство по «shiny» от RStudio. URL: <http://shiny.rstudio.com/tutorial/>   
 
 [^5]: Правило Стёрджеса / Материал из Википедии -- свободной энциклопедии. URL: <https://ru.wikipedia.org/wiki/Правило_Стёрджеса>   
 
-[^6]: Jeffrey Leek. Материалы курса «Getting and Cleaning Data» Университета Джонса Хопкинса на портале coursera.org, доступные в репозитории на <https://github.com>: <https://github.com/jtleek/modules/tree/master/03_GettingData>   
-
-[^7]: Tal Galili. Simpler R coding with pipes > the present and future of the magrittr package / R-statistics blog (August 5, 2014). URL: <http://www.r-statistics.com/2014/08/simpler-r-coding-with-pipes-the-present-and-future-of-the-magrittr-package/>    
+[^6]: Jeffrey Leek. Материалы курса «Getting and Cleaning Data» Университета Джонса Хопкинса на портале coursera.org, доступные в репозитории на GitHub: <https://github.com/jtleek/modules/tree/master/03_GettingData>   
