@@ -17,7 +17,9 @@ output:
 
 Все ссылки действительны на 02 марта 2021 г.  
 
-Файл с макетом кода для этой практики: [lab_2-3-2021_before.R](https://sites.google.com/a/kiber-guu.ru/r-practice/dpv/lab_2-3-2021_before.R?attredirects=0&d=1)  
+Репозиторий с материалами к курсу: [https://github.com/aksyuk/DPV-R_Materials](https://github.com/aksyuk/DPV-R_Materials)   
+
+Файл с макетом кода для этой практики: `.Labs/Lab03/lab_2-3-2021_before.R`    
 
 ```{r setup, include = F}
 knitr::opts_chunk$set(

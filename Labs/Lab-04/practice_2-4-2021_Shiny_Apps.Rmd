@@ -12,21 +12,21 @@ output:
 
 Ключевые слова: R[^1], r-project, RStudio  
 
-Версия 2.0.0 (2019)  
-
 Примеры выполнены R версии `r paste0(R.version$major, '.', R.version$minor)`, "`r R.version$nickname`".  
 
-Версия RStudio: 1.1.453.  
+Версия RStudio: 1.4.1103.   
 
-Все ссылки действительны на 5 марта 2019 г.  
+Все ссылки действительны на 23 марта 2021 г.  
 
-Файл с макетом кода для этой практики: [lab_2-4-2019_before.R](https://sites.google.com/a/kiber-guu.ru/r-practice/dpv/lab_2-4_before.R?attredirects=0&d=1)     
+Репозиторий с материалами к курсу: [https://github.com/aksyuk/DPV-R_Materials](https://github.com/aksyuk/DPV-R_Materials)   
 
-Шаблон кода приложения iris_hist_app: [iris_hist_app.zip](https://sites.google.com/a/kiber-guu.ru/r-practice/dpv/iris_hist_app.zip?attredirects=0&d=1)     
+Файл с макетом кода для этой практики: `.Labs/Lab04/lab_2-4-2021_before.R`  
 
-Шаблон кода приложения air_plot_app: [air_plot_app.zip](https://sites.google.com/a/kiber-guu.ru/r-practice/dpv/air_plot_app.zip?attredirects=0&d=1)     
+Файлы с кодом приложения iris_hist_app: `.Labs/Lab04/iris_hist_app/*.*`     
 
-Шаблон кода приложения import_app: [import_app.zip](https://sites.google.com/a/kiber-guu.ru/r-practice/dpv/import_app.zip?attredirects=0&d=1)     
+Файлы с кодом приложения air_plot_app: `.Labs/Lab04/air_plot_app/*.*`     
+
+Файлы с кодом приложения import_app: `.Labs/Lab04/import_app/*.*`     
 
 
 ```{r setup, include = F}
