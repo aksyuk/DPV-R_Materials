@@ -15,7 +15,7 @@ shinyUI(
                          selected = 'Месяц'),
             # слайдер: фильтр по годам
             sliderInput('year.range', 'Годы:',
-                        min = 2010, max = 2017, value = c(2010, 2017),
+                        min = 2010, max = 2020, value = c(2010, 2020),
                         width = "100%", sep = ''),
             # выпадающее меню: страна для отбора наблюдений
             uiOutput('stateList')

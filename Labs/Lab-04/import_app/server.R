@@ -29,6 +29,7 @@ shinyServer(function(input, output) {
     # список стран для выбора
     output$stateList <- renderUI({
         state.list <- sort(unique(DT.import$Reporter))
+        state.list <- state.list[state.list != ""]
         radioButtons('state',   # связанная переменная
                      'Выберите торгового партнёра:', state.list, 
                      selected = state.list[1])

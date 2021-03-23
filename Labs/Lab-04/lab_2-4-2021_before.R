@@ -50,7 +50,7 @@ histogram( ,
                         length = hist.int + 1))
 
 # загрузить архив с приложением
-file.URL <- 'https://sites.google.com/a/kiber-guu.ru/r-practice/dpv/iris_hist_app.zip?attredirects=0&d=1'
+file.URL <- 'https://github.com/aksyuk/DPV-R_Materials/raw/master/Labs/Lab-04/iris_hist_app.zip'
 download.file(file.URL, destfile = 'iris_hist_app.zip',
               mode = 'wb', cacheOK = FALSE)
 # распаковать
@@ -91,7 +91,7 @@ gp <-
 gp
 
 # загрузить архив с приложением
-file.URL <- 'https://sites.google.com/a/kiber-guu.ru/r-practice/dpv/air_plot_app.zip?attredirects=0&d=1'
+file.URL <- 'https://github.com/aksyuk/DPV-R_Materials/raw/master/Labs/Lab-04/air_plot_app.zip'
 download.file(file.URL, destfile = 'air_plot_app.zip',
               mode = 'wb', cacheOK = FALSE)
 # распаковать
@@ -159,7 +159,7 @@ head(DT.import, n = 3)
 #  данные – можно сохранить в файл с расширением «.csv».
 
 # загрузить архив с приложением
-file.URL <- 'https://sites.google.com/a/kiber-guu.ru/r-practice/dpv/import_app.zip?attredirects=0&d=1'
+file.URL <- 'https://github.com/aksyuk/DPV-R_Materials/raw/master/Labs/Lab-04/import_app.zip'
 download.file(file.URL, destfile = 'import_app.zip',
               mode = 'wb', cacheOK = FALSE)
 # распаковать

@@ -50,14 +50,14 @@ histogram( ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width,
                         length = hist.int + 1))
 
 # загрузить архив с приложением
-file.URL <- 'https://sites.google.com/a/kiber-guu.ru/r-practice/dpv/iris_hist_app.zip?attredirects=0&d=1'
+file.URL <- 'https://github.com/aksyuk/DPV-R_Materials/raw/master/Labs/Lab-04/iris_hist_app.zip'
 download.file(file.URL, destfile = 'iris_hist_app.zip',
               mode = 'wb', cacheOK = FALSE)
 # распаковать
 unzip('iris_hist_app.zip', overwrite = T)
 
-# ДАЛЬШЕ ИЗМЕНЯЕМ ФАЙЛЫ ПРИЛОЖЕНИЯ: ui.R и server.R ............................
-#  в папке iris_hist_app                            ............................
+# ДАЛЬШЕ ИЗМЕНЯЕМ ФАЙЛЫ ПРИЛОЖЕНИЯ: ui.R и server.R 
+#  в папке iris_hist_app .......................................................
 
 # запустить приложение
 runApp('./iris_hist_app', launch.browser = T, 
@@ -91,14 +91,14 @@ gp <- gp + geom_point() + geom_smooth(method = 'lm')
 gp
 
 # загрузить архив с приложением
-file.URL <- 'https://sites.google.com/a/kiber-guu.ru/r-practice/dpv/air_plot_app.zip?attredirects=0&d=1'
+file.URL <- 'https://github.com/aksyuk/DPV-R_Materials/raw/master/Labs/Lab-04/air_plot_app.zip'
 download.file(file.URL, destfile = 'air_plot_app.zip',
               mode = 'wb', cacheOK = FALSE)
 # распаковать
 unzip('air_plot_app.zip', overwrite = T)
 
-# ДАЛЬШЕ ИЗМЕНЯЕМ ФАЙЛЫ ПРИЛОЖЕНИЯ: ui.R и server.R ............................
-#  в папке air_plot_app                             ............................
+# ДАЛЬШЕ ИЗМЕНЯЕМ ФАЙЛЫ ПРИЛОЖЕНИЯ: ui.R и server.R
+#  в папке air_plot_app ........................................................
 
 # запустить приложение
 runApp('./air_plot_app', launch.browser = T,
@@ -159,14 +159,14 @@ head(DT.import, n = 3)
 #  данные – можно сохранить в файл с расширением «.csv».
 
 # загрузить архив с приложением
-file.URL <- 'https://sites.google.com/a/kiber-guu.ru/r-practice/dpv/import_app.zip?attredirects=0&d=1'
+file.URL <- 'https://github.com/aksyuk/DPV-R_Materials/raw/master/Labs/Lab-04/import_app.zip'
 download.file(file.URL, destfile = 'import_app.zip',
               mode = 'wb', cacheOK = FALSE)
 # распаковать
 unzip('import_app.zip', overwrite = T)
 
-# ДАЛЬШЕ ИЗМЕНЯЕМ ФАЙЛЫ ПРИЛОЖЕНИЯ: ui.R и server.R ............................
-#  в папке import_app                               ............................
+# ДАЛЬШЕ ИЗМЕНЯЕМ ФАЙЛЫ ПРИЛОЖЕНИЯ: ui.R и server.R
+#  в папке import_app ..........................................................
 
 # запустить приложение
 runApp('./import_app', launch.browser = T,
