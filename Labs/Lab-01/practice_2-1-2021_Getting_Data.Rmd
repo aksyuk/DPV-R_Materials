@@ -152,14 +152,18 @@ tail(DF.import)    # последние несколько строк табли
 
 ```{r paragraph-02-chunk-01}
 # Загрузка пакетов
-library('RCurl')               # работа с URL
+library('httr')                # работа с URL по https
+library('RCurl')               # работа с URL по http
 library('XML')                 # разбор XML-файлов
 
 # адрес XML-страницы
 fileURL <- 'https://www.w3schools.com/xml/simple.xml'
 
-# загружаем содержимое в объект doc
-doc <- getURL(fileURL)
+# Define certicificate file
+cafile <- system.file("CurlSSL", "cacert.pem", package = "RCurl")
+
+# Read page
+doc <- GET(fileURL, config(cainfo = cafile))
 
 # разбираем объект как XML
 parsedXML <- xmlTreeParse(doc, useInternalNodes = T)
@@ -793,7 +797,7 @@ for (i in 2011:2019) {
 
 ## Варианты  
 
-1. Кинопоиск, топ-100 за 2015 год (<https://www.kinopoisk.ru/top/y/2015/>).     
+1. Кинопоиск, рейтинг лучших фильмов за текущий год (<https://www.kinopoisk.ru/lists/navigator/2021/?quick_filters=films&limit=20&tab=best>).     
 
 1. Кинопоиск, рейтинг фильмов про драконов (<https://www.kinopoisk.ru/lists/editorial/theme_dragon/>).      
 
