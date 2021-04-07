@@ -795,15 +795,15 @@ for (i in 2011:2019) {
 
 1. Кинопоиск, топ-100 за 2015 год (<https://www.kinopoisk.ru/top/y/2015/>).     
 
-1. Кинопоиск, топ-100 за 2016 год (<https://www.kinopoisk.ru/top/y/2016/>).      
+1. Кинопоиск, рейтинг фильмов про драконов (<https://www.kinopoisk.ru/lists/editorial/theme_dragon/>).      
 
-1. Кинопоиск, топ-100 за 2017 год (<https://www.kinopoisk.ru/top/y/2017/>).       
+1. Кинопоиск, рейтинг фильмов про вампиров (<https://www.kinopoisk.ru/lists/editorial/theme_vampire/>).       
 
-1. Кинопоиск, топ-100 за 2018 год (<https://www.kinopoisk.ru/top/y/2018/>).      
+1. Кинопоиск, рейтинг фильмов про любовь (<https://www.kinopoisk.ru/lists/editorial/theme_love/>).      
 
-1. Кинопоиск, топ-100 за 2019 год (<https://www.kinopoisk.ru/top/y/2019/>).      
+1. Кинопоиск, рейтинг фильмов про зомби (<https://www.kinopoisk.ru/lists/editorial/theme_zombie/>).      
 
-1. Кинопоиск, топ-100 за 2020 год (<https://www.kinopoisk.ru/top/y/2020/>).       
+1. Кинопоиск, рейтинг фильмов про космос (<https://www.kinopoisk.ru/lists/editorial/theme_space/>).       
 
 1. Яндекс.Маркет, планшеты (Москва).   
 
