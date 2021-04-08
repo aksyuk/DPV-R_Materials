@@ -56,6 +56,7 @@ TG <- gvisMerge(g.tbl, g.chart,
 TG
 
 # cat(TG$html$chart, file = "TG.html")
+
 ```
 
 
@@ -91,6 +92,7 @@ addTiles() %>% addMarkers(icon = ranepa.icon, popup = ranepa.sites)
 
 # рисуем карту
 myMap
+
 ```
 
 ### Использованы пакеты R  

@@ -56,6 +56,7 @@ TG <- gvisMerge(g.tbl, g.chart,
 
 # вставляем результат в html-документ
 TG
+
 ```
 
 
@@ -89,6 +90,7 @@ addTiles() %>% addMarkers(icon = pharm.icon, popup = map.sites)
 
 # рисуем карту
 myMap
+
 ```
 
 Карта построена по данным схемы размещения источников твёрдых бытовых отходов в Ямало-Ненецком автономном округе (Портал открытых данных РФ). Радиусы пропорциональны численности населения на 1 января 2016 года.    
@@ -109,6 +111,7 @@ addTiles() %>%
 addMarkers(popup = popups,
            clusterOptions = markerClusterOptions()) %>% 
 addCircles(weight = 1, radius = sqrt(DT.rad$Численность.населения.МО.на.01.01.2016.г.) * 100)
+
 ```
 
 
