@@ -3,7 +3,7 @@ title: "Интерактивные карты с GVis, plotly и leaflet"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
-    self_contained: yes
+    self_contained: no
     css: style.css
 ---
 
@@ -23,12 +23,12 @@ suppressPackageStartupMessages(library('googleVis'))
 
 ## Интерактивная картограмма  
 
-Интерактивная картограмма на данных Всемирного Банка по [ВВП на душу населения в текущих ценах (долл. США)](https://data.worldbank.org/indicator/NY.GDP.PCAP.CD?view=chart) за 2017 год.     
+Интерактивная картограмма на данных Всемирного Банка по [ВВП на душу населения в текущих ценах (долл. США)](https://data.worldbank.org/indicator/NY.GDP.PCAP.CD?view=chart) за 2019 год.     
 
 ```{r Интерактивная картограмма, results = 'asis', cashe = T}
 # данные по ВВП по ППП
 indicator.code <- 'NY.GDP.PCAP.PP.CD'
-DT <- data.table(WDI(indicator = indicator.code, start = 2017, end = 2017))
+DT <- data.table(WDI(indicator = indicator.code, start = 2019, end = 2019))
 
 # все коды стран iso2
 fileURL <- 'https://pkgstore.datahub.io/core/country-list/data_csv/data/d7c9d7cfb42cb69f4422dec222dbbaa8/data_csv.csv'
