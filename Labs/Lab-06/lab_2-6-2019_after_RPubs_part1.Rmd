@@ -3,7 +3,7 @@ title: "Интерактивные карты с GVis, plotly и leaflet"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
-    self_contained: yes
+    self_contained: no
     css: style.css
 ---
 
@@ -58,61 +58,6 @@ TG <- gvisMerge(g.tbl, g.chart,
 
 # вставляем результат в html-документ
 TG
-
-```
-
-
-## Карты на основе leaflet    
-
-На этой карте показано расположение аптек в г.Уренгой. Список аптек получен с Портала открытых данных РФ, географические координаты определены по адресам с помощью API Яндекс Геокодера.    
-
-```{r Карта с маркерами на основе leaflet, results = 'asis', message = F}
-# картинка-логотип для маркеров объекта
-fileURL <- 'https://github.com/aksyuk/R-data/raw/master/pics/pharmacy-icon.png'
-pharm.icon <- makeIcon(iconUrl = fileURL, 
-                       iconWidth = 31,
-                       iconHeight = 31,
-                       iconAnchorX = 31,
-                       iconAnchorY = 31)
-
-fileURL <- 'https://raw.githubusercontent.com/aksyuk/R-data/master/examples/Urengoy_pharmacies.csv'
-
-DT.loc <- read.csv2(fileURL, stringsAsFactors = F)
-DT.loc$lat <- as.numeric(DT.loc$lat)
-DT.loc$long <- as.numeric(DT.loc$long)
-
-# подписи к объектам с гиперссылками
-map.sites <- paste0(DT.loc$Наименование.объекта, '</br>',
-                    DT.loc$Режим.работы, '</br>',
-                    '<em>', DT.loc$Контактный.телефон, '</em>')
-
-# создаём виджет с картой
-myMap <- DT.loc %>% leaflet(width = 800, height = 800) %>% 
-addTiles() %>% addMarkers(icon = pharm.icon, popup = map.sites)
-
-# рисуем карту
-myMap
-
-```
-
-Карта построена по данным схемы размещения источников твёрдых бытовых отходов в Ямало-Ненецком автономном округе (Портал открытых данных РФ). Радиусы пропорциональны численности населения на 1 января 2016 года.    
-
-```{r Карта с радиусами на основе leaflet, results = 'asis', message = F}
-fileURL <- 'https://raw.githubusercontent.com/aksyuk/R-data/master/examples/YNao_tbo.csv'
-
-DT.rad <- read.csv2(fileURL, stringsAsFactors = F, na.strings = '-')
-DT.rad <- na.omit(DT.rad)
-
-popups <- paste0('<b>', DT.rad$Наименование.источника.образования.отходов,
-                 '</b></br>', DT.rad$Численность.населения.МО.на.01.01.2016.г.,
-                 ' чел.')
-
-DT.rad %>%
-leaflet() %>%
-addTiles() %>%
-addMarkers(popup = popups,
-           clusterOptions = markerClusterOptions()) %>% 
-addCircles(weight = 1, radius = sqrt(DT.rad$Численность.населения.МО.на.01.01.2016.г.) * 100)
 
 ```
 

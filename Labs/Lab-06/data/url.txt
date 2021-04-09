@@ -1,1 +1,0 @@
-https://geocode-maps.yandex.ru/1.x/?format=json&apikey=4805f844-8782-4568-b6ee-3b476bd3be07&geocode=п.”ренгой,+3-й+мкр.,+д.+19+а
