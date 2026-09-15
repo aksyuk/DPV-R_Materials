@@ -216,6 +216,7 @@ rootNode <- xmlRoot(parsedHTML)
 # выбираем все наименования книг
 wiki.title <- xpathSApply(rootNode, '//span[@class="mw-headline"][1]/parent::h2/following-sibling::div//li/a[1]',
                           xmlGetAttr, 'title')
+
 # проверяем длину
 length(wiki.title)
 

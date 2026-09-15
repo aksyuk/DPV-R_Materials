@@ -675,11 +675,11 @@ library('rjson')
 # адрес справочника по странам UN COMTRADE
 fileURL <- "http://comtrade.un.org/data/cache/partnerAreas.json"
 # загружаем данные из формата JSON
-reporters <- fromJSON(file = fileURL)
+reporters <- fromJSON(file = fileURL, simplify = T)
 is.list(reporters)
 
 # соединяем элементы списка построчно
-reporters <- t(sapply(reporters$results, rbind))
+reporters <- sapply(reporters$results, unlist) %>% as.vector
 dim(reporters)
 
 # превращаем во фрейм
